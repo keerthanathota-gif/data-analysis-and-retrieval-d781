@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CFR Agentic AI</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="dashboard-page">
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <h1>CFR Agentic AI</h1>
+            <span class="user-badge">User</span>
+        </div>
+        <div class="nav-menu">
+            <span id="userDisplayName" class="user-name"></span>
+            <button onclick="logout()" class="btn-logout">Logout</button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <ul class="nav-links">
+                <li><a href="#overview" class="active" onclick="showSection('overview')">Overview</a></li>
+                <li><a href="#search" onclick="showSection('search')">RAG Search</a></li>
+                <li><a href="#results" onclick="showSection('results')">View Results</a></li>
+                <li><a href="#stats" onclick="showSection('stats')">Statistics</a></li>
+            </ul>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="content-area">
+            <!-- Overview Section -->
+            <section id="overview-section" class="content-section active">
+                <h2>Welcome to CFR Analysis Platform</h2>
+                <p>You have <strong>User</strong> access level.</p>
+
+                <div class="info-cards">
+                    <div class="info-card">
+                        <h3>What You Can Do</h3>
+                        <ul>
+                            <li>✓ Search regulations using RAG queries</li>
+                            <li>✓ View clustering results</li>
+                            <li>✓ Browse analysis reports</li>
+                            <li>✓ View visualizations</li>
+                            <li>✓ Download results</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>Restrictions</h3>
+                        <ul>
+                            <li>✗ Cannot run data pipeline</li>
+                            <li>✗ Cannot perform clustering</li>
+                            <li>✗ Cannot run analysis</li>
+                            <li>✗ Cannot manage users</li>
+                        </ul>
+                        <p class="note">Contact admin for elevated access</p>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="quick-stats" id="quickStats">
+                    <h3>Quick Statistics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <span class="stat-value" id="statChapters">-</span>
+                            <span class="stat-label">Chapters</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-value" id="statSubchapters">-</span>
+                            <span class="stat-label">Subchapters</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-value" id="statSections">-</span>
+                            <span class="stat-label">Sections</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Search Section -->
+            <section id="search-section" class="content-section">
+                <h2>RAG Search</h2>
+                <p>Search regulations using natural language queries</p>
+
+                <div class="search-box">
+                    <input
+                        type="text"
+                        id="ragQuery"
+                        placeholder="e.g., privacy protection requirements"
+                        class="search-input"
+                    >
+                    <button onclick="performSearch()" class="btn-primary">Search</button>
+                </div>
+
+                <div id="searchResults" class="search-results">
+                    <!-- Results will be populated here -->
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section id="results-section" class="content-section">
+                <h2>Analysis Results</h2>
+                <p>Browse existing clustering and similarity results</p>
+
+                <div class="results-tabs">
+                    <button class="tab-btn active" onclick="showResults('clustering')">Clustering</button>
+                    <button class="tab-btn" onclick="showResults('similarity')">Similarity</button>
+                </div>
+
+                <div id="resultsContent" class="results-content">
+                    <p class="placeholder">Select a result type to view</p>
+                </div>
+            </section>
+
+            <!-- Stats Section -->
+            <section id="stats-section" class="content-section">
+                <h2>Detailed Statistics</h2>
+                <div id="detailedStats" class="detailed-stats">
+                    <p>Loading statistics...</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
