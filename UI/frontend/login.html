@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - CFR Agentic AI</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="login-page">
+    <div class="login-container">
+        <div class="login-box">
+            <!-- Logo/Header -->
+            <div class="login-header">
+                <h1>CFR Agentic AI</h1>
+                <p class="subtitle">Code of Federal Regulations Analysis Platform</p>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="login-form">
+                <h2>Login</h2>
+
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        required
+                        autocomplete="username"
+                        placeholder="Enter your username"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        required
+                        autocomplete="current-password"
+                        placeholder="Enter your password"
+                    >
+                </div>
+
+                <!-- Error Message -->
+                <div id="errorMessage" class="error-message" style="display: none;"></div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn-primary" id="loginBtn">
+                    Login
+                </button>
+
+                <!-- Loading Spinner -->
+                <div id="loadingSpinner" class="loading-spinner" style="display: none;">
+                    <div class="spinner"></div>
+                    <span>Authenticating...</span>
+                </div>
+            </form>
+
+            <!-- Help Text -->
+            <div class="help-section">
+                <p class="help-text">
+                    <strong>Default Admin Credentials:</strong><br>
+                    Username: <code>admin</code><br>
+                    Password: <code>admin123</code>
+                </p>
+                <p class="help-note">
+                    ⚠️ Change the admin password after first login
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="login-footer">
+            <p>&copy; 2025 CFR Agentic AI Platform</p>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/auth.js"></script>
+</body>
+</html>
