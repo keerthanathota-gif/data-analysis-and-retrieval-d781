@@ -1,0 +1,60 @@
+import React from 'react';
+import { AppBar, Toolbar, Typography, Button, Box, Container } from '@mui/material';
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigate, useLocation } from 'react-router-dom';
+
+const Layout = ({ children }) => {
+  const { user, logout, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
+  };
+
+  const handleNavigation = (path) => {
+    navigate(path);
+  };
+
+  return (
+    <Box sx={{ flexGrow: 1 }}>
+      {isAuthenticated && (
+        <AppBar position="static">
+          <Toolbar>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              CPSC Regulation System
+            </Typography>
+            <Button
+              color="inherit"
+              onClick={() => handleNavigation('/dashboard')}
+              sx={{ mr: 2 }}
+            >
+              Dashboard
+            </Button>
+            {user?.role === 'admin' && (
+              <Button
+                color="inherit"
+                onClick={() => handleNavigation('/admin')}
+                sx={{ mr: 2 }}
+              >
+                Admin
+              </Button>
+            )}
+            <Typography variant="body2" sx={{ mr: 2 }}>
+              Welcome, {user?.username}
+            </Typography>
+            <Button color="inherit" onClick={handleLogout}>
+              Logout
+            </Button>
+          </Toolbar>
+        </AppBar>
+      )}
+      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+        {children}
+      </Container>
+    </Box>
+  );
+};
+
+export default Layout;
