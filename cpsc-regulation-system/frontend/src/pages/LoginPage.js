@@ -13,7 +13,7 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import GoogleIcon from '@mui/icons-material/Google';
 import AppleIcon from '@mui/icons-material/Apple';
-import WindowsIcon from '@mui/icons-material/Windows';
+import MicrosoftIcon from '@mui/icons-material/Microsoft';
 import { authService } from '../services/authService';
 
 const LoginPage = () => {
@@ -124,7 +124,7 @@ const LoginPage = () => {
             </Typography>
             <Box display="flex" gap={2}>
               <Button fullWidth variant="outlined" startIcon={<GoogleIcon />} onClick={() => handleOAuth('google')}>Google</Button>
-              <Button fullWidth variant="outlined" startIcon={<WindowsIcon />} onClick={() => handleOAuth('microsoft')}>Microsoft</Button>
+              <Button fullWidth variant="outlined" startIcon={<MicrosoftIcon />} onClick={() => handleOAuth('microsoft')}>Microsoft</Button>
               <Button fullWidth variant="outlined" startIcon={<AppleIcon />} onClick={() => handleOAuth('apple')}>Apple</Button>
             </Box>
             <Box textAlign="center">
