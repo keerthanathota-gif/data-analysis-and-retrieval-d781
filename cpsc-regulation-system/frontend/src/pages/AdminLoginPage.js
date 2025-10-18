@@ -8,25 +8,17 @@ import {
   Typography,
   Box,
   Alert,
-  CircularProgress,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem
+  CircularProgress
 } from '@mui/material';
-import { useAuth } from '../contexts/AuthContext';
+import { authService } from '../services/authService';
 
-const SignupPage = () => {
+const AdminLoginPage = () => {
   const [formData, setFormData] = useState({
     username: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    role: 'user'
+    password: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signup } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -39,24 +31,14 @@ const SignupPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
     setLoading(true);
 
     try {
-      await signup({
-        username: formData.username,
-        email: formData.email,
-        password: formData.password,
-        role: formData.role
-      });
-      navigate('/login');
+      const response = await authService.adminLogin(formData.username, formData.password);
+      localStorage.setItem('token', response.access_token);
+      navigate('/admin-panel');
     } catch (err) {
-      setError(err.response?.data?.detail || 'Signup failed');
+      setError(err.response?.data?.detail || 'Admin login failed');
     } finally {
       setLoading(false);
     }
@@ -77,9 +59,9 @@ const SignupPage = () => {
             CPSC Regulation System
           </Typography>
           <Typography component="h2" variant="h6" align="center" color="textSecondary" gutterBottom>
-            Sign Up
+            Admin Sign In
           </Typography>
-          
+
           {error && (
             <Alert severity="error" sx={{ mb: 2 }}>
               {error}
@@ -103,39 +85,14 @@ const SignupPage = () => {
               margin="normal"
               required
               fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
               name="password"
               label="Password"
               type="password"
               id="password"
-              autoComplete="new-password"
+              autoComplete="current-password"
               value={formData.password}
               onChange={handleChange}
             />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="confirmPassword"
-              label="Confirm Password"
-              type="password"
-              id="confirmPassword"
-              autoComplete="new-password"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-            />
-            {/* Admin signup is disabled via UI; role is fixed to 'user' */}
             <Button
               type="submit"
               fullWidth
@@ -143,12 +100,12 @@ const SignupPage = () => {
               sx={{ mt: 3, mb: 2 }}
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} /> : 'Sign Up'}
+              {loading ? <CircularProgress size={24} /> : 'Sign In'}
             </Button>
             <Box textAlign="center">
               <Link to="/login" style={{ textDecoration: 'none' }}>
                 <Typography variant="body2" color="primary">
-                  Already have an account? Sign In
+                  User login
                 </Typography>
               </Link>
             </Box>
@@ -159,4 +116,4 @@ const SignupPage = () => {
   );
 };
 
-export default SignupPage;
+export default AdminLoginPage;

@@ -36,6 +36,11 @@ export const authService = {
     return response.data;
   },
 
+  async adminLogin(username, password) {
+    const response = await api.post('/auth/admin-login', { username, password });
+    return response.data;
+  },
+
   async signup(userData) {
     const response = await api.post('/auth/signup', userData);
     return response.data;
@@ -53,6 +58,17 @@ export const authService = {
 
   async logout() {
     const response = await api.post('/auth/logout');
+    return response.data;
+  }
+  ,
+
+  async oauthStart(provider) {
+    const response = await api.get('/auth/oauth/start', { params: { provider } });
+    return response.data; // { provider, state }
+  },
+
+  async oauthCallback(payload) {
+    const response = await api.post('/auth/oauth/callback', payload);
     return response.data;
   }
 };

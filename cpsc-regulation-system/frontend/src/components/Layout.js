@@ -35,7 +35,7 @@ const Layout = ({ children }) => {
             {user?.role === 'admin' && (
               <Button
                 color="inherit"
-                onClick={() => handleNavigation('/admin')}
+              onClick={() => handleNavigation('/admin-panel')}
                 sx={{ mr: 2 }}
               >
                 Admin
