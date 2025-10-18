@@ -11,6 +11,10 @@ import {
   CircularProgress
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
+import GoogleIcon from '@mui/icons-material/Google';
+import AppleIcon from '@mui/icons-material/Apple';
+import WindowsIcon from '@mui/icons-material/Windows';
+import { authService } from '../services/authService';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -41,6 +45,18 @@ const LoginPage = () => {
       setError(err.response?.data?.detail || 'Login failed');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleOAuth = async (provider) => {
+    try {
+      // In a real app, redirect to provider. For now, simulate start
+      await authService.oauthStart(provider);
+      // The real redirect is handled outside of this codebase; assume the
+      // provider redirects back to /oauth-callback which will call backend.
+      window.location.href = `/oauth-callback?provider=${provider}`;
+    } catch (e) {
+      setError('Unable to start OAuth flow');
     }
   };
 
@@ -102,6 +118,15 @@ const LoginPage = () => {
             >
               {loading ? <CircularProgress size={24} /> : 'Sign In'}
             </Button>
+
+            <Typography align="center" variant="body2" color="textSecondary" sx={{ my: 1 }}>
+              Or continue with
+            </Typography>
+            <Box display="flex" gap={2}>
+              <Button fullWidth variant="outlined" startIcon={<GoogleIcon />} onClick={() => handleOAuth('google')}>Google</Button>
+              <Button fullWidth variant="outlined" startIcon={<WindowsIcon />} onClick={() => handleOAuth('microsoft')}>Microsoft</Button>
+              <Button fullWidth variant="outlined" startIcon={<AppleIcon />} onClick={() => handleOAuth('apple')}>Apple</Button>
+            </Box>
             <Box textAlign="center">
               <Link to="/signup" style={{ textDecoration: 'none' }}>
                 <Typography variant="body2" color="primary">

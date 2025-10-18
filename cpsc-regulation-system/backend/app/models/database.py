@@ -2,7 +2,7 @@
 Enhanced Database models for CPSC Regulation System with Authentication
 """
 
-from sqlalchemy import create_engine, Column, Integer, String, Text, Float, ForeignKey, DateTime, Boolean, Enum
+from sqlalchemy import create_engine, Column, Integer, String, Text, Float, ForeignKey, DateTime, Boolean, Enum, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from datetime import datetime
@@ -156,6 +156,26 @@ class User(Base):
     
     # Relationships
     activity_logs = relationship("ActivityLog", back_populates="user", cascade="all, delete-orphan")
+    oauth_accounts = relationship("OAuthAccount", back_populates="user", cascade="all, delete-orphan")
+
+class OAuthAccount(Base):
+    __tablename__ = 'oauth_accounts'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False, index=True)
+    provider = Column(String(50), nullable=False)  # google, microsoft, apple
+    provider_account_id = Column(String(255), nullable=False)  # sub/oidc subject
+    access_token = Column(Text)
+    refresh_token = Column(Text)
+    expires_at = Column(DateTime)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    __table_args__ = (
+        UniqueConstraint('provider', 'provider_account_id', name='uq_provider_account'),
+    )
+
+    # Relationships
+    user = relationship("User", back_populates="oauth_accounts")
 
 class ActivityLog(Base):
     __tablename__ = 'activity_logs'
