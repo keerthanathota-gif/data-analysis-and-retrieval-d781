@@ -12,6 +12,8 @@ from app.auth.dependencies import get_current_active_user, get_admin_user
 from datetime import datetime, timedelta
 import os
 import base64
+import httpx
+import urllib.parse
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
 auth_service = AuthService()
@@ -174,12 +176,28 @@ async def logout(
             detail=f"Error during logout: {str(e)}"
         )
 
-# OAuth endpoints (minimal implementation that keeps environment stable)
+# OAuth endpoints
 @router.get("/oauth/start")
 async def oauth_start(provider: str = Query(..., pattern="^(google|microsoft|apple)$")):
-    """Return CSRF state for starting OAuth on the frontend."""
+    """Return CSRF state and client ID for starting OAuth on the frontend."""
+    from app.config import GOOGLE_CLIENT_ID, MICROSOFT_CLIENT_ID, APPLE_CLIENT_ID
+    
     state = base64.urlsafe_b64encode(os.urandom(24)).decode().rstrip("=")
-    return {"provider": provider, "state": state}
+    
+    # Get the appropriate client ID based on provider
+    client_id = None
+    if provider == "google":
+        client_id = GOOGLE_CLIENT_ID
+    elif provider == "microsoft":
+        client_id = MICROSOFT_CLIENT_ID
+    elif provider == "apple":
+        client_id = APPLE_CLIENT_ID
+    
+    return {
+        "provider": provider,
+        "state": state,
+        "client_id": client_id  # Will be None if not configured
+    }
 
 @router.post("/oauth/callback", response_model=Token)
 async def oauth_callback(
@@ -232,4 +250,130 @@ async def oauth_token_login(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error during OAuth token login: {str(e)}"
+        )
+
+# Provider-specific OAuth callback handlers
+@router.get("/oauth/{provider}/callback")
+async def oauth_provider_callback(
+    provider: str,
+    code: str = Query(None),
+    state: str = Query(None),
+    error: str = Query(None),
+    error_description: str = Query(None),
+    db: Session = Depends(get_db)
+):
+    """Handle OAuth provider callback with authorization code."""
+    from app.config import (
+        GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI,
+        MICROSOFT_CLIENT_ID, MICROSOFT_CLIENT_SECRET, MICROSOFT_REDIRECT_URI,
+        APPLE_CLIENT_ID, APPLE_CLIENT_SECRET, APPLE_REDIRECT_URI,
+        FRONTEND_URL
+    )
+    
+    # Handle OAuth errors
+    if error:
+        return RedirectResponse(
+            url=f"{FRONTEND_URL}/login?error={error}&description={urllib.parse.quote(error_description or '')}"
+        )
+    
+    if not code or not state:
+        return RedirectResponse(
+            url=f"{FRONTEND_URL}/login?error=missing_parameters"
+        )
+    
+    try:
+        # Get provider configuration
+        if provider == "google":
+            token_url = "https://oauth2.googleapis.com/token"
+            userinfo_url = "https://www.googleapis.com/oauth2/v2/userinfo"
+            client_id = GOOGLE_CLIENT_ID
+            client_secret = GOOGLE_CLIENT_SECRET
+            redirect_uri = GOOGLE_REDIRECT_URI
+        elif provider == "microsoft":
+            token_url = "https://login.microsoftonline.com/common/oauth2/v2.0/token"
+            userinfo_url = "https://graph.microsoft.com/v1.0/me"
+            client_id = MICROSOFT_CLIENT_ID
+            client_secret = MICROSOFT_CLIENT_SECRET
+            redirect_uri = MICROSOFT_REDIRECT_URI
+        elif provider == "apple":
+            # Apple Sign In requires special handling
+            token_url = "https://appleid.apple.com/auth/token"
+            userinfo_url = None  # Apple doesn't have a userinfo endpoint
+            client_id = APPLE_CLIENT_ID
+            client_secret = APPLE_CLIENT_SECRET
+            redirect_uri = APPLE_REDIRECT_URI
+        else:
+            return RedirectResponse(
+                url=f"{FRONTEND_URL}/login?error=invalid_provider"
+            )
+        
+        if not client_id or not client_secret:
+            return RedirectResponse(
+                url=f"{FRONTEND_URL}/login?error=provider_not_configured"
+            )
+        
+        # Exchange authorization code for access token
+        async with httpx.AsyncClient() as client:
+            token_response = await client.post(
+                token_url,
+                data={
+                    "grant_type": "authorization_code",
+                    "code": code,
+                    "redirect_uri": redirect_uri,
+                    "client_id": client_id,
+                    "client_secret": client_secret,
+                }
+            )
+            
+            if token_response.status_code != 200:
+                return RedirectResponse(
+                    url=f"{FRONTEND_URL}/login?error=token_exchange_failed"
+                )
+            
+            token_data = token_response.json()
+            access_token = token_data.get("access_token")
+            refresh_token = token_data.get("refresh_token")
+            id_token = token_data.get("id_token")
+            expires_in = token_data.get("expires_in")
+            
+            # Get user information
+            user_info = {}
+            if provider == "apple" and id_token:
+                # For Apple, decode the id_token to get user info
+                import jwt
+                user_info = jwt.decode(id_token, options={"verify_signature": False})
+            elif userinfo_url and access_token:
+                # For Google and Microsoft, fetch user info from API
+                headers = {"Authorization": f"Bearer {access_token}"}
+                userinfo_response = await client.get(userinfo_url, headers=headers)
+                if userinfo_response.status_code == 200:
+                    user_info = userinfo_response.json()
+            
+            # Extract user details
+            email = user_info.get("email")
+            name = user_info.get("name") or user_info.get("displayName")
+            provider_account_id = user_info.get("sub") or user_info.get("id")
+            
+            # Login or register the user
+            token_result = auth_service.login_or_register_oauth(
+                db=db,
+                provider=provider,
+                provider_account_id=provider_account_id,
+                email=email,
+                name=name,
+                access_token=access_token,
+                refresh_token=refresh_token,
+                expires_at=datetime.utcnow() + timedelta(seconds=expires_in) if expires_in else None
+            )
+            
+            # Redirect to frontend with JWT token
+            jwt_token = token_result["access_token"]
+            return RedirectResponse(
+                url=f"{FRONTEND_URL}/oauth-callback?token={jwt_token}&provider={provider}"
+            )
+            
+    except Exception as e:
+        print(f"OAuth callback error: {str(e)}")
+        return RedirectResponse(
+            url=f"{FRONTEND_URL}/login?error=authentication_failed&details={urllib.parse.quote(str(e))}"
         )
