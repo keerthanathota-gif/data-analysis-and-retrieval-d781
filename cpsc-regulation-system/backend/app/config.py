@@ -57,6 +57,31 @@ SECRET_KEY = "your-secret-key-change-in-production"  # Change this in production
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
+# Frontend base URL (used for OAuth callback redirects)
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
+
+# OAuth (OIDC) provider configuration - set env vars in deployment
+# Google
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
+GOOGLE_REDIRECT_URI = os.getenv(
+    "GOOGLE_REDIRECT_URI", "http://localhost:8000/auth/oauth/google/callback"
+)
+
+# Microsoft (v2.0 endpoint)
+MICROSOFT_CLIENT_ID = os.getenv("MICROSOFT_CLIENT_ID")
+MICROSOFT_CLIENT_SECRET = os.getenv("MICROSOFT_CLIENT_SECRET")
+MICROSOFT_REDIRECT_URI = os.getenv(
+    "MICROSOFT_REDIRECT_URI", "http://localhost:8000/auth/oauth/microsoft/callback"
+)
+
+# Apple (requires private key based client secret; placeholder support)
+APPLE_CLIENT_ID = os.getenv("APPLE_CLIENT_ID")
+APPLE_CLIENT_SECRET = os.getenv("APPLE_CLIENT_SECRET")  # Pre-signed JWT
+APPLE_REDIRECT_URI = os.getenv(
+    "APPLE_REDIRECT_URI", "http://localhost:8000/auth/oauth/apple/callback"
+)
+
 # CORS settings
 ALLOWED_ORIGINS = [
     "http://localhost:3000",  # React dev server

@@ -45,6 +45,17 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const loginAdmin = async (username, password) => {
+    try {
+      const response = await authService.adminLogin(username, password);
+      localStorage.setItem('token', response.access_token);
+      setUser(response.user);
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const signup = async (userData) => {
     try {
       const response = await authService.signup(userData);
@@ -78,6 +89,7 @@ export const AuthProvider = ({ children }) => {
   const value = {
     user,
     login,
+    loginAdmin,
     signup,
     logout,
     updateUser,
