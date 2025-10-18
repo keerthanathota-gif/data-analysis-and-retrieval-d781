@@ -9,7 +9,7 @@ from typing import List, Dict, Any, Tuple
 from sqlalchemy.orm import Session
 from sklearn.cluster import KMeans
 
-from app.database import (
+from app.models.database import (
     Chapter, Subchapter, Section, Part,
     ChapterEmbedding, SubchapterEmbedding, SectionEmbedding,
     Cluster, SessionLocal

@@ -9,7 +9,7 @@ from typing import List, Dict, Any, Tuple
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
 
-from app.database import (
+from app.models.database import (
     Chapter, Subchapter, Section,
     ChapterEmbedding, SubchapterEmbedding, SectionEmbedding,
     SimilarityResult, ParityCheck, SessionLocal

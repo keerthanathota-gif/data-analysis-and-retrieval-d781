@@ -8,7 +8,7 @@ from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 
-from app.database import (
+from app.models.database import (
     Chapter, Subchapter, Part, Section,
     ChapterEmbedding, SubchapterEmbedding, SectionEmbedding,
     SessionLocal
