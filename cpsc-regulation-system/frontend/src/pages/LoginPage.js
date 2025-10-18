@@ -15,6 +15,7 @@ import GoogleIcon from '@mui/icons-material/Google';
 import AppleIcon from '@mui/icons-material/Apple';
 import MicrosoftIcon from '@mui/icons-material/Microsoft';
 import { authService } from '../services/authService';
+import { getOAuthUrl } from '../config/oauth-config';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -42,21 +43,41 @@ const LoginPage = () => {
       await login(formData.username, formData.password);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.detail || 'Login failed');
+      console.error('Login error:', err);
+      const errorMessage = err.response?.data?.detail || 
+                          err.response?.data?.message || 
+                          err.message || 
+                          'Sign in failed. Please check your credentials and try again.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   const handleOAuth = async (provider) => {
+    setError('');
+    setLoading(true);
     try {
-      // In a real app, redirect to provider. For now, simulate start
-      await authService.oauthStart(provider);
-      // The real redirect is handled outside of this codebase; assume the
-      // provider redirects back to /oauth-callback which will call backend.
-      window.location.href = `/oauth-callback?provider=${provider}`;
-    } catch (e) {
-      setError('Unable to start OAuth flow');
+      // Get state token from backend for CSRF protection
+      const { state, client_id } = await authService.oauthStart(provider);
+      
+      // Store state in sessionStorage for verification
+      sessionStorage.setItem('oauth_state', state);
+      sessionStorage.setItem('oauth_provider', provider);
+      
+      // If we have a client_id from backend, use real OAuth flow
+      if (client_id) {
+        const authUrl = getOAuthUrl(provider, state, client_id);
+        window.location.href = authUrl;
+      } else {
+        // Fallback for development/testing without OAuth credentials
+        setError(`OAuth provider ${provider} is not configured. Please set ${provider.toUpperCase()}_CLIENT_ID environment variable.`);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error('OAuth start error:', error);
+      setError('Unable to start OAuth flow. Please try again.');
+      setLoading(false);
     }
   };
 
@@ -79,7 +100,7 @@ const LoginPage = () => {
           </Typography>
           
           {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
+            <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
               {error}
             </Alert>
           )}

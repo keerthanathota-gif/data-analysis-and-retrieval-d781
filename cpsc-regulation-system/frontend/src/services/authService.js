@@ -59,12 +59,11 @@ export const authService = {
   async logout() {
     const response = await api.post('/auth/logout');
     return response.data;
-  }
-  ,
+  },
 
   async oauthStart(provider) {
     const response = await api.get('/auth/oauth/start', { params: { provider } });
-    return response.data; // { provider, state }
+    return response.data; // { provider, state, client_id }
   },
 
   async oauthCallback(payload) {
