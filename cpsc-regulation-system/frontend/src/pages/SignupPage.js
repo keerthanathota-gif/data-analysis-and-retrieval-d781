@@ -14,7 +14,10 @@ import {
   Select,
   MenuItem
 } from '@mui/material';
+import GoogleIcon from '@mui/icons-material/Google';
 import { useAuth } from '../contexts/AuthContext';
+import { authService } from '../services/authService';
+import { getOAuthUrl } from '../config/oauth-config';
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({
@@ -56,8 +59,40 @@ const SignupPage = () => {
       });
       navigate('/login');
     } catch (err) {
-      setError(err.response?.data?.detail || 'Signup failed');
+      const errorMessage = err.response?.data?.detail || 
+                          err.response?.data?.message || 
+                          err.message || 
+                          'Signup failed. Please check your information and try again.';
+      setError(errorMessage);
     } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOAuth = async (provider) => {
+    setError('');
+    setLoading(true);
+    try {
+      // Get state token from backend for CSRF protection
+      const { state, client_id } = await authService.oauthStart(provider);
+      
+      // Store state in sessionStorage for verification
+      sessionStorage.setItem('oauth_state', state);
+      sessionStorage.setItem('oauth_provider', provider);
+      sessionStorage.setItem('oauth_signup', 'true'); // Mark as signup flow
+      
+      // If we have a client_id from backend, use real OAuth flow
+      if (client_id) {
+        const authUrl = getOAuthUrl(provider, state, client_id);
+        window.location.href = authUrl;
+      } else {
+        // Fallback for development/testing without OAuth credentials
+        setError(`OAuth provider ${provider} is not configured. Please set ${provider.toUpperCase()}_CLIENT_ID environment variable.`);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error('OAuth start error:', error);
+      setError('Unable to start OAuth flow. Please try again.');
       setLoading(false);
     }
   };
@@ -81,7 +116,7 @@ const SignupPage = () => {
           </Typography>
           
           {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
+            <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
               {error}
             </Alert>
           )}
@@ -145,6 +180,22 @@ const SignupPage = () => {
             >
               {loading ? <CircularProgress size={24} /> : 'Sign Up'}
             </Button>
+            
+            <Typography align="center" variant="body2" color="textSecondary" sx={{ my: 2 }}>
+              Or continue with
+            </Typography>
+            
+            <Button 
+              fullWidth 
+              variant="outlined" 
+              startIcon={<GoogleIcon />} 
+              onClick={() => handleOAuth('google')}
+              disabled={loading}
+              sx={{ mb: 2 }}
+            >
+              Continue with Google
+            </Button>
+            
             <Box textAlign="center">
               <Link to="/login" style={{ textDecoration: 'none' }}>
                 <Typography variant="body2" color="primary">
