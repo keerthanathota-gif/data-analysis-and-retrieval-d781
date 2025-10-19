@@ -12,10 +12,10 @@ from tqdm import tqdm
 
 from app.pipeline.crawler import download_and_extract_zip
 from app.pipeline.cfr_parser import parse_chapter_subchapter_part_sections, save_json, save_csv
-from app.models.database import (
+from app.models.cfr_database import (
     Chapter, Subchapter, Part, Section,
     ChapterEmbedding, SubchapterEmbedding, SectionEmbedding,
-    init_db, SessionLocal
+    init_cfr_db, SessionLocal
 )
 from app.services.embedding_service import EmbeddingService
 from app.config import DEFAULT_CRAWL_URLS, DATA_DIR, OUTPUT_DIR

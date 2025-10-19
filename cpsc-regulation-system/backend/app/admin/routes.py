@@ -5,9 +5,10 @@ Admin routes for CPSC Regulation System
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks, Request
 from sqlalchemy.orm import Session
 from typing import List
-from app.models.database import get_db, UserRole
+from app.models.auth_database import get_auth_db, UserRole
+from app.models.cfr_database import get_cfr_db, Section, Chapter, Subchapter
 from app.models.schemas import (
-    UserResponse, UserManagementRequest, AdminStats, 
+    UserResponse, UserManagementRequest, AdminStats,
     PipelineRequest, PipelineResponse, PipelineStatus,
     ActivityLogResponse
 )
@@ -16,7 +17,6 @@ from app.auth.auth_service import AuthService
 from app.pipeline.data_pipeline import DataPipeline
 from app.services.analysis_service import AnalysisService
 from app.services.clustering_service import ClusteringService
-from app.models.database import Section, Chapter, Subchapter
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 auth_service = AuthService()
@@ -40,17 +40,18 @@ pipeline_status_global = {
 @router.get("/stats", response_model=AdminStats)
 async def get_admin_stats(
     current_user = Depends(get_admin_user),
-    db: Session = Depends(get_db)
+    auth_db: Session = Depends(get_auth_db),
+    cfr_db: Session = Depends(get_cfr_db)
 ):
     """Get system statistics"""
     try:
-        user_stats = auth_service.get_user_stats(db)
-        
+        user_stats = auth_service.get_user_stats(auth_db)
+
         # Get data statistics
-        total_sections = db.query(Section).count()
-        total_chapters = db.query(Chapter).count()
-        total_subchapters = db.query(Subchapter).count()
-        
+        total_sections = cfr_db.query(Section).count()
+        total_chapters = cfr_db.query(Chapter).count()
+        total_subchapters = cfr_db.query(Subchapter).count()
+
         return AdminStats(
             total_users=user_stats["total_users"],
             active_users=user_stats["active_users"],
@@ -72,11 +73,11 @@ async def get_all_users(
     skip: int = 0,
     limit: int = 100,
     current_user = Depends(get_admin_user),
-    db: Session = Depends(get_db)
+    auth_db: Session = Depends(get_auth_db)
 ):
     """Get all users with pagination"""
     try:
-        users = auth_service.get_all_users(db, skip=skip, limit=limit)
+        users = auth_service.get_all_users(auth_db, skip=skip, limit=limit)
         return users
     except Exception as e:
         raise HTTPException(
@@ -89,20 +90,20 @@ async def update_user_role(
     user_id: int,
     new_role: UserRole,
     current_user = Depends(get_admin_user),
-    db: Session = Depends(get_db)
+    auth_db: Session = Depends(get_auth_db)
 ):
     """Update user role"""
     try:
-        user = auth_service.update_user_role(db, user_id, new_role)
-        
+        user = auth_service.update_user_role(auth_db, user_id, new_role)
+
         # Log activity
         auth_service.log_activity(
-            db=db,
+            db=auth_db,
             user_id=current_user.id,
             action="user_role_update",
             details=f"Admin {current_user.username} changed user {user.username} role to {new_role.value}"
         )
-        
+
         return {"message": f"User role updated to {new_role.value}"}
     except HTTPException:
         raise
@@ -116,20 +117,20 @@ async def update_user_role(
 async def activate_user(
     user_id: int,
     current_user = Depends(get_admin_user),
-    db: Session = Depends(get_db)
+    auth_db: Session = Depends(get_auth_db)
 ):
     """Activate user"""
     try:
-        user = auth_service.activate_user(db, user_id)
-        
+        user = auth_service.activate_user(auth_db, user_id)
+
         # Log activity
         auth_service.log_activity(
-            db=db,
+            db=auth_db,
             user_id=current_user.id,
             action="user_activate",
             details=f"Admin {current_user.username} activated user {user.username}"
         )
-        
+
         return {"message": "User activated successfully"}
     except HTTPException:
         raise
@@ -143,20 +144,20 @@ async def activate_user(
 async def deactivate_user(
     user_id: int,
     current_user = Depends(get_admin_user),
-    db: Session = Depends(get_db)
+    auth_db: Session = Depends(get_auth_db)
 ):
     """Deactivate user"""
     try:
-        user = auth_service.deactivate_user(db, user_id)
-        
+        user = auth_service.deactivate_user(auth_db, user_id)
+
         # Log activity
         auth_service.log_activity(
-            db=db,
+            db=auth_db,
             user_id=current_user.id,
             action="user_deactivate",
             details=f"Admin {current_user.username} deactivated user {user.username}"
         )
-        
+
         return {"message": "User deactivated successfully"}
     except HTTPException:
         raise
@@ -172,11 +173,11 @@ async def get_activity_logs(
     skip: int = 0,
     limit: int = 100,
     current_user = Depends(get_admin_user),
-    db: Session = Depends(get_db)
+    auth_db: Session = Depends(get_auth_db)
 ):
     """Get activity logs with optional user filter"""
     try:
-        logs = auth_service.get_activity_logs(db, user_id=user_id, skip=skip, limit=limit)
+        logs = auth_service.get_activity_logs(auth_db, user_id=user_id, skip=skip, limit=limit)
         return logs
     except Exception as e:
         raise HTTPException(
@@ -189,7 +190,7 @@ async def run_pipeline(
     request: PipelineRequest,
     background_tasks: BackgroundTasks,
     current_user = Depends(get_admin_user),
-    db: Session = Depends(get_db)
+    auth_db: Session = Depends(get_auth_db)
 ):
     """Run the complete data pipeline"""
     global pipeline_instance, pipeline_status_global
@@ -226,7 +227,7 @@ async def run_pipeline(
     
     # Log activity
     auth_service.log_activity(
-        db=db,
+        db=auth_db,
         user_id=current_user.id,
         action="pipeline_run",
         details=f"Admin {current_user.username} started pipeline with {len(request.urls)} URLs"
@@ -254,34 +255,35 @@ async def get_pipeline_status(
 @router.post("/pipeline/reset")
 async def reset_pipeline(
     current_user = Depends(get_admin_user),
-    db: Session = Depends(get_db)
+    auth_db: Session = Depends(get_auth_db),
+    cfr_db: Session = Depends(get_cfr_db)
 ):
     """Reset entire database and clear all data"""
     try:
         import shutil
         from app.config import DATA_DIR, OUTPUT_DIR, VISUALIZATIONS_DIR
         import os
-        
-        # Reset database
-        from app.models.database import reset_db
-        reset_db()
-        
+
+        # Reset CFR database only
+        from app.models.cfr_database import reset_cfr_db
+        reset_cfr_db()
+
         # Clear data directories
         for directory in [DATA_DIR, OUTPUT_DIR, VISUALIZATIONS_DIR]:
             if os.path.exists(directory):
                 shutil.rmtree(directory)
                 os.makedirs(directory)
-        
+
         # Log activity
         auth_service.log_activity(
-            db=db,
+            db=auth_db,
             user_id=current_user.id,
             action="pipeline_reset",
             details=f"Admin {current_user.username} reset the entire pipeline"
         )
-        
+
         return {
-            "message": "Database and data reset successfully",
+            "message": "CFR database and data reset successfully",
             "status": "success"
         }
     except Exception as e:
@@ -294,20 +296,21 @@ async def reset_pipeline(
 async def run_analysis(
     level: str,
     current_user = Depends(get_admin_user),
-    db: Session = Depends(get_db)
+    auth_db: Session = Depends(get_auth_db),
+    cfr_db: Session = Depends(get_cfr_db)
 ):
     """Run analysis on specified level"""
     try:
-        results = analysis_service.analyze_semantic_similarity(level, db)
-        
+        results = analysis_service.analyze_semantic_similarity(level, cfr_db)
+
         # Log activity
         auth_service.log_activity(
-            db=db,
+            db=auth_db,
             user_id=current_user.id,
             action="analysis_run",
             details=f"Admin {current_user.username} ran analysis on {level} level"
         )
-        
+
         return {
             "level": level,
             "total_pairs": len(results),
@@ -324,20 +327,21 @@ async def run_clustering(
     level: str,
     n_clusters: int = None,
     current_user = Depends(get_admin_user),
-    db: Session = Depends(get_db)
+    auth_db: Session = Depends(get_auth_db),
+    cfr_db: Session = Depends(get_cfr_db)
 ):
     """Run clustering on specified level"""
     try:
-        results = clustering_service.cluster_items(level, db, n_clusters=n_clusters)
-        
+        results = clustering_service.cluster_items(level, cfr_db, n_clusters=n_clusters)
+
         # Log activity
         auth_service.log_activity(
-            db=db,
+            db=auth_db,
             user_id=current_user.id,
             action="clustering_run",
             details=f"Admin {current_user.username} ran clustering on {level} level"
         )
-        
+
         return results
     except Exception as e:
         raise HTTPException(

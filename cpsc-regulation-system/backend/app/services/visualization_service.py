@@ -17,7 +17,7 @@ from typing import List, Dict, Any, Optional
 import os
 from datetime import datetime
 
-from app.models.database import SessionLocal, Cluster, SectionEmbedding, SubchapterEmbedding, ChapterEmbedding
+from app.models.cfr_database import SessionLocal, Cluster, SectionEmbedding, SubchapterEmbedding, ChapterEmbedding
 from app.config import VISUALIZATIONS_DIR
 
 

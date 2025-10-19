@@ -15,7 +15,7 @@ from app.config import (
 )
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
-from app.models.database import User, UserRole, ActivityLog, OAuthAccount
+from app.models.auth_database import User, UserRole, ActivityLog, OAuthAccount
 from app.auth.password_utils import verify_password, get_password_hash, check_password_strength
 from app.auth.jwt_utils import create_access_token
 from app.config import ACCESS_TOKEN_EXPIRE_MINUTES
