@@ -110,8 +110,10 @@ class AuthService:
                 "id": user.id,
                 "username": user.username,
                 "email": user.email,
-                "role": user.role.value,
-                "is_active": user.is_active
+                "role": user.role,  # Pass the enum directly, not the value
+                "is_active": user.is_active,
+                "created_at": user.created_at,
+                "last_login": user.last_login
             }
         }
 
@@ -156,8 +158,10 @@ class AuthService:
                 "id": user.id,
                 "username": user.username,
                 "email": user.email,
-                "role": user.role.value,
-                "is_active": user.is_active
+                "role": user.role,  # Pass the enum directly, not the value
+                "is_active": user.is_active,
+                "created_at": user.created_at,
+                "last_login": user.last_login
             }
         }
 
@@ -261,9 +265,11 @@ class AuthService:
                 "id": user.id,
                 "username": user.username,
                 "email": user.email,
-                "role": user.role.value,
+                "role": user.role,  # Pass the enum directly, not the value
                 "is_active": user.is_active,
-            },
+                "created_at": user.created_at,
+                "last_login": user.last_login
+            }
         }
 
     # --- ID token verification for real OAuth logins ---
