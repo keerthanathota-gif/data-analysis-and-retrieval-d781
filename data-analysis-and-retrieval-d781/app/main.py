@@ -2,10 +2,10 @@
 Main FastAPI Application for CFR Agentic AI Application
 """
 
-from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks, Query
+from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, HttpUrl
 from typing import List, Optional, Dict, Any
@@ -21,6 +21,8 @@ from app.services.visualization_service import VisualizationService
 from app.services.embedding_service import EmbeddingService
 from app.services.llm_service import get_llm_service
 from app.config import API_HOST, API_PORT, VISUALIZATIONS_DIR, DATA_DIR, OUTPUT_DIR
+from app.auth.routes import router as auth_router
+from app.auth.models import init_auth_db
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -45,6 +47,9 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # Mount static files for visualizations
 app.mount("/visualizations", StaticFiles(directory=VISUALIZATIONS_DIR), name="visualizations")
+
+# Include auth routes
+app.include_router(auth_router)
 
 # Initialize service instances
 analysis_service = AnalysisService()
@@ -71,7 +76,43 @@ pipeline_status_global = {
 @app.on_event("startup")
 async def startup_event():
     init_db()
+    init_auth_db()
     print("Database initialized")
+
+
+# Protect UI and API endpoints via middleware
+@app.middleware("http")
+async def auth_middleware(request: Request, call_next):
+    path = request.url.path
+    # Public paths
+    if (
+        path == "/" or
+        path.startswith("/auth") or
+        path.startswith("/health") or
+        path.startswith("/openapi") or
+        path.startswith("/docs") or
+        path.startswith("/redoc") or
+        path.startswith("/mcp")
+    ):
+        return await call_next(request)
+
+    # Protected paths
+    if path.startswith("/ui") or path.startswith("/api") or path.startswith("/visualizations"):
+        auth_header = request.headers.get("Authorization")
+        if not auth_header or not auth_header.lower().startswith("bearer "):
+            if path.startswith("/ui") or path.startswith("/visualizations"):
+                return RedirectResponse(url="/login", status_code=302)
+            return JSONResponse(status_code=401, content={"detail": "Not authenticated"})
+        token = auth_header.split(" ", 1)[1]
+        try:
+            from app.auth.jwt_utils import verify_token
+            verify_token(token)
+        except Exception:
+            if path.startswith("/ui") or path.startswith("/visualizations"):
+                return RedirectResponse(url="/login", status_code=302)
+            return JSONResponse(status_code=401, content={"detail": "Invalid token"})
+
+    return await call_next(request)
 
 
 # Pydantic models for request/response
@@ -691,6 +732,21 @@ async def serve_ui():
     """Serve the UI"""
     import os
     static_path = os.path.join(os.path.dirname(__file__), "static", "index.html")
+    return FileResponse(static_path)
+
+
+# Serve static login and signup pages
+@app.get("/login")
+async def serve_login():
+    import os
+    static_path = os.path.join(os.path.dirname(__file__), "static", "login.html")
+    return FileResponse(static_path)
+
+
+@app.get("/signup")
+async def serve_signup():
+    import os
+    static_path = os.path.join(os.path.dirname(__file__), "static", "signup.html")
     return FileResponse(static_path)
 
 
