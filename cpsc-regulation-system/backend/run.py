@@ -4,7 +4,6 @@ Main entry point for CPSC Regulation System Backend
 """
 
 import uvicorn
-from app.main import app
 from app.config import API_HOST, API_PORT
 
 if __name__ == "__main__":
@@ -15,7 +14,7 @@ if __name__ == "__main__":
     print("\n" + "="*50)
     
     uvicorn.run(
-        app,
+        "app.main:app",  # Use import string instead of direct app reference
         host=API_HOST,
         port=API_PORT,
         reload=True,

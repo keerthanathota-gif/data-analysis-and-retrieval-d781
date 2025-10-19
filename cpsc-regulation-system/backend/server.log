@@ -1,12 +1,16 @@
-INFO:     Started server process [3809]
+INFO:     Will watch for changes in these directories: ['/workspace/cpsc-regulation-system/backend']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [1935] using WatchFiles
+🚀 Starting CPSC Regulation System Backend...
+📡 Server will be available at: http://0.0.0.0:8000
+📚 API Documentation: http://0.0.0.0:8000/api/docs
+🎨 Frontend: http://0.0.0.0:8000/ui
+
+==================================================
+INFO:     Started server process [1956]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
-INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
 Database initialized and default admin user created
-INFO:     127.0.0.1:39514 - "GET /docs HTTP/1.1" 404 Not Found
-INFO:     127.0.0.1:39518 - "POST /auth/signup HTTP/1.1" 400 Bad Request
-INFO:     127.0.0.1:39518 - "POST /auth/login HTTP/1.1" 200 OK
-INFO:     127.0.0.1:39518 - "GET /auth/me HTTP/1.1" 200 OK
-INFO:     127.0.0.1:39518 - "POST /auth/logout HTTP/1.1" 200 OK
-INFO:     127.0.0.1:39518 - "POST /auth/login HTTP/1.1" 401 Unauthorized
-INFO:     127.0.0.1:39518 - "GET /auth/oauth/start?provider=google HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60114 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39346 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39354 - "GET /auth/oauth/start?provider=google HTTP/1.1" 200 OK

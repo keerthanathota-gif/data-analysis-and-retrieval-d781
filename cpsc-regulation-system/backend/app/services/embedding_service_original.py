@@ -1,40 +1,23 @@
 """
-Mock Embedding Service for CFR Agentic AI Application
-This is a simplified version that doesn't require ML libraries
+Embedding Service for CFR Agentic AI Application
+Uses sentence-transformers for generating embeddings
 """
 
+from sentence_transformers import SentenceTransformer
 import numpy as np
 from typing import List, Union
 import json
-import hashlib
 from app.config import EMBEDDING_MODEL, EMBEDDING_DIMENSION
 
 class EmbeddingService:
     def __init__(self, model_name: str = EMBEDDING_MODEL):
-        """Initialize the mock embedding service"""
-        self.model_name = model_name
+        """Initialize the embedding service with a sentence transformer model"""
+        self.model = SentenceTransformer(model_name)
         self.dimension = EMBEDDING_DIMENSION
-    
-    def _text_to_mock_embedding(self, text: str) -> List[float]:
-        """Create a deterministic mock embedding from text"""
-        # Create a hash-based mock embedding
-        hash_obj = hashlib.sha256(text.encode())
-        hash_bytes = hash_obj.digest()
-        
-        # Convert hash to float values
-        np.random.seed(int.from_bytes(hash_bytes[:4], byteorder='big'))
-        embedding = np.random.randn(self.dimension)
-        
-        # Normalize
-        norm = np.linalg.norm(embedding)
-        if norm > 0:
-            embedding = embedding / norm
-            
-        return embedding.tolist()
     
     def generate_embedding(self, text: str) -> List[float]:
         """
-        Generate mock embedding for a single text
+        Generate embedding for a single text
         
         Args:
             text: Input text to embed
@@ -45,11 +28,12 @@ class EmbeddingService:
         if not text or not text.strip():
             return [0.0] * self.dimension
         
-        return self._text_to_mock_embedding(text)
+        embedding = self.model.encode(text, convert_to_numpy=True)
+        return embedding.tolist()
     
     def generate_embeddings(self, texts: List[str]) -> List[List[float]]:
         """
-        Generate mock embeddings for multiple texts
+        Generate embeddings for multiple texts in batch
         
         Args:
             texts: List of input texts to embed
@@ -60,14 +44,11 @@ class EmbeddingService:
         if not texts:
             return []
         
-        embeddings = []
-        for text in texts:
-            if text and text.strip():
-                embeddings.append(self._text_to_mock_embedding(text))
-            else:
-                embeddings.append([0.0] * self.dimension)
+        # Replace empty strings with placeholder
+        processed_texts = [text if text and text.strip() else " " for text in texts]
         
-        return embeddings
+        embeddings = self.model.encode(processed_texts, convert_to_numpy=True, show_progress_bar=True)
+        return embeddings.tolist()
     
     def compute_similarity(self, embedding1: Union[List[float], str], 
                           embedding2: Union[List[float], str]) -> float:
