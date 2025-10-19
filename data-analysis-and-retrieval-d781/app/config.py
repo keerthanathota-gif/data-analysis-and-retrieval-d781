@@ -16,6 +16,8 @@ CRAWL_URLS = DEFAULT_CRAWL_URLS.copy()
 
 # Database configuration
 DATABASE_URL = f"sqlite:///{os.path.join(BASE_DIR, 'cfr_data.db')}"
+# Separate authentication database (local-only)
+AUTH_DATABASE_URL = f"sqlite:///{os.path.join(BASE_DIR, 'auth.db')}"
 
 # Embedding model configuration
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
@@ -46,6 +48,10 @@ VISUALIZATIONS_DIR = os.path.join(BASE_DIR, "visualizations")
 # FastAPI settings
 API_HOST = "0.0.0.0"
 API_PORT = 8000
+# Auth/JWT settings
+SECRET_KEY = os.getenv("APP_SECRET_KEY", "change-this-in-production")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "120"))
 
 # Model Context Protocol settings
 MCP_ENABLED = True
