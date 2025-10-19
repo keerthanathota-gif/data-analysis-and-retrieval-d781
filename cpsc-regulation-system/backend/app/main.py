@@ -9,7 +9,8 @@ from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 import os
 
-from app.models.database import init_db, create_default_admin
+from app.models.auth_database import init_auth_db, create_default_admin
+from app.models.cfr_database import init_cfr_db
 from app.auth.routes import router as auth_router
 from app.admin.routes import router as admin_router
 from app.search.routes import router as search_router
@@ -46,13 +47,16 @@ app.include_router(auth_router)
 app.include_router(admin_router)
 app.include_router(search_router)
 
-# Initialize database on startup
+# Initialize databases on startup
 @app.on_event("startup")
 async def startup_event():
-    """Initialize database and create default admin user"""
-    init_db()
+    """Initialize both databases and create default admin user"""
+    init_auth_db()
+    init_cfr_db()
     create_default_admin()
-    print("Database initialized and default admin user created")
+    print("[OK] Auth database initialized")
+    print("[OK] CFR database initialized")
+    print("[OK] Default admin user created")
 
 # Root endpoint
 @app.get("/")

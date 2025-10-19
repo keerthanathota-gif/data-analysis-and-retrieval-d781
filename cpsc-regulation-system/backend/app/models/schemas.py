@@ -5,7 +5,7 @@ Pydantic models for CPSC Regulation System
 from pydantic import BaseModel, EmailStr, validator
 from typing import Optional, List
 from datetime import datetime
-from app.models.database import UserRole
+from app.models.auth_database import UserRole
 
 # Authentication schemas
 class UserBase(BaseModel):

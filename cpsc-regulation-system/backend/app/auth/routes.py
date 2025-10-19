@@ -5,7 +5,7 @@ Authentication routes for CPSC Regulation System
 from fastapi import APIRouter, Depends, HTTPException, status, Request, Query
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
-from app.models.database import get_db, UserRole, User
+from app.models.auth_database import get_auth_db as get_db, UserRole, User
 from app.models.schemas import UserCreate, UserLogin, Token, UserResponse, UserUpdate
 from app.auth.auth_service import AuthService
 from app.auth.dependencies import get_current_active_user, get_admin_user

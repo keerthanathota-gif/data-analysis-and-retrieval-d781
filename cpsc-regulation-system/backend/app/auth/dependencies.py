@@ -5,7 +5,7 @@ Authentication dependencies for CPSC Regulation System
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
-from app.models.database import get_db, User, UserRole
+from app.models.auth_database import get_auth_db as get_db, User, UserRole
 from app.auth.jwt_utils import verify_token
 
 # Security scheme

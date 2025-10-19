@@ -18,8 +18,12 @@ DEFAULT_CRAWL_URLS = [
 # URLs will be set dynamically by user input
 CRAWL_URLS = DEFAULT_CRAWL_URLS.copy()
 
-# Database configuration
-DATABASE_URL = f"sqlite:///{os.path.join(BASE_DIR, 'cfr_data.db')}"
+# Database configuration - Dual databases for clean separation
+AUTH_DATABASE_URL = f"sqlite:///{os.path.join(BASE_DIR, 'auth.db')}"
+CFR_DATABASE_URL = f"sqlite:///{os.path.join(BASE_DIR, 'cfr_data.db')}"
+
+# Legacy support - some old imports might still use DATABASE_URL
+DATABASE_URL = CFR_DATABASE_URL  # Deprecated - use CFR_DATABASE_URL or AUTH_DATABASE_URL
 
 # Embedding model configuration
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
