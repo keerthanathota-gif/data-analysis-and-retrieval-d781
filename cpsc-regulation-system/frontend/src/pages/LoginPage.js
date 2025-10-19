@@ -12,8 +12,6 @@ import {
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 import GoogleIcon from '@mui/icons-material/Google';
-import AppleIcon from '@mui/icons-material/Apple';
-import MicrosoftIcon from '@mui/icons-material/Microsoft';
 import { authService } from '../services/authService';
 import { getOAuthUrl } from '../config/oauth-config';
 
@@ -140,14 +138,19 @@ const LoginPage = () => {
               {loading ? <CircularProgress size={24} /> : 'Sign In'}
             </Button>
 
-            <Typography align="center" variant="body2" color="textSecondary" sx={{ my: 1 }}>
+            <Typography align="center" variant="body2" color="textSecondary" sx={{ my: 2 }}>
               Or continue with
             </Typography>
-            <Box display="flex" gap={2}>
-              <Button fullWidth variant="outlined" startIcon={<GoogleIcon />} onClick={() => handleOAuth('google')}>Google</Button>
-              <Button fullWidth variant="outlined" startIcon={<MicrosoftIcon />} onClick={() => handleOAuth('microsoft')}>Microsoft</Button>
-              <Button fullWidth variant="outlined" startIcon={<AppleIcon />} onClick={() => handleOAuth('apple')}>Apple</Button>
-            </Box>
+            <Button 
+              fullWidth 
+              variant="outlined" 
+              startIcon={<GoogleIcon />} 
+              onClick={() => handleOAuth('google')}
+              disabled={loading}
+              sx={{ mb: 2 }}
+            >
+              Continue with Google
+            </Button>
             <Box textAlign="center">
               <Link to="/signup" style={{ textDecoration: 'none' }}>
                 <Typography variant="body2" color="primary">
