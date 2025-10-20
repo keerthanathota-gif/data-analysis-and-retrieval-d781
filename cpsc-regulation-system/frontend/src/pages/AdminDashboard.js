@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Container,
   Paper,
   Typography,
   Box,
@@ -147,7 +146,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <Container maxWidth="lg">
+    <Box sx={{ width: '100%', p: { xs: 2, md: 3 } }}>
       <Typography variant="h4" component="h1" gutterBottom>
         Admin Dashboard
       </Typography>
@@ -405,7 +404,7 @@ const AdminDashboard = () => {
           )}
         </Paper>
       )}
-    </Container>
+    </Box>
   );
 };
 
