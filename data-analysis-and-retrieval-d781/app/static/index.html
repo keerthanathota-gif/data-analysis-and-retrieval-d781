@@ -13,24 +13,26 @@
         }
 
         :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary: #8b5cf6;
+            /* Soft, professional pink/purple palette */
+            --primary: #c084fc;         /* light purple */
+            --primary-dark: #a78bfa;    /* deeper purple */
+            --secondary: #f472b6;       /* soft pink */
+            --accent: #fbcfe8;          /* very light pink */
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
             --dark: #1e293b;
-            --light: #f8fafc;
-            --border: #e2e8f0;
-            --text: #334155;
-            --text-light: #64748b;
+            --light: #faf7fb;           /* pink-tinted light */
+            --border: #efe7f6;          /* subtle border */
+            --text: #374151;
+            --text-light: #6b7280;
         }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(160deg, #fdf2f8 0%, #f5f3ff 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 24px;
             color: var(--text);
         }
 
@@ -39,7 +41,7 @@
             margin: 0 auto;
             background: white;
             border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 14px 40px rgba(17, 12, 34, 0.08);
             overflow: hidden;
             animation: slideUp 0.6s ease-out;
         }
@@ -57,8 +59,8 @@
 
         /* Header */
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: linear-gradient(135deg, #fbcfe8 0%, #e9d5ff 100%);
+            color: #3f3f46;
             padding: 40px;
             position: relative;
             overflow: hidden;
@@ -71,7 +73,7 @@
             right: -10%;
             width: 500px;
             height: 500px;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.35);
             border-radius: 50%;
         }
 
@@ -81,12 +83,12 @@
         }
 
         .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
+            font-size: 2.4em;
+            margin-bottom: 8px;
             font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
 
         .header h1 i {
@@ -94,9 +96,9 @@
         }
 
         .header p {
-            font-size: 1.2em;
-            opacity: 0.95;
-            font-weight: 300;
+            font-size: 1.1em;
+            opacity: 0.9;
+            font-weight: 400;
         }
 
         .header-stats {
@@ -124,34 +126,45 @@
             opacity: 0.9;
         }
 
-        /* Navigation */
+        /* Layout with vertical sidebar */
+        .layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+            padding: 24px;
+        }
+
+        /* Sidebar */
         .nav-tabs {
             display: flex;
-            background: var(--light);
-            border-bottom: 2px solid var(--border);
-            overflow-x: auto;
+            flex-direction: column;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 12px;
+            gap: 6px;
             position: sticky;
-            top: 0;
-            z-index: 100;
+            top: 24px;
+            align-self: start;
+            box-shadow: 0 6px 24px rgba(17, 12, 34, 0.06);
         }
 
         .nav-tab {
-            flex: 1;
-            min-width: 150px;
-            padding: 20px 25px;
-            text-align: center;
+            width: 100%;
+            padding: 12px 14px;
+            text-align: left;
             cursor: pointer;
-            transition: all 0.3s;
-            border: none;
+            transition: all 0.25s ease;
+            border: 1px solid transparent;
             background: transparent;
             font-size: 15px;
             font-weight: 600;
             color: var(--text-light);
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             gap: 10px;
-            position: relative;
+            border-radius: 10px;
         }
 
         .nav-tab i {
@@ -159,29 +172,27 @@
         }
 
         .nav-tab:hover {
-            background: white;
+            background: rgba(203, 213, 225, 0.12);
             color: var(--primary);
         }
 
         .nav-tab.active {
-            background: white;
+            background: linear-gradient(135deg, rgba(251, 207, 232, 0.35), rgba(233, 213, 255, 0.35));
             color: var(--primary);
+            border-color: rgba(160, 99, 245, 0.35);
+            box-shadow: 0 8px 18px rgba(160, 99, 245, 0.1);
         }
 
-        .nav-tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: var(--primary);
-        }
+        .nav-tab.active::after { display: none; }
 
         /* Content */
+        .main-content {
+            min-width: 0; /* prevent overflow in grid */
+        }
+
         .tab-content {
             display: none;
-            padding: 40px;
+            padding: 32px;
             animation: fadeIn 0.5s;
         }
 
@@ -202,17 +213,17 @@
 
         /* Cards */
         .card {
-            background: white;
+            background: #ffffff;
             border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 14px rgba(17, 12, 34, 0.06);
             border: 1px solid var(--border);
-            transition: all 0.3s;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
         .card:hover {
-            box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+            box-shadow: 0 10px 22px rgba(17, 12, 34, 0.08);
             transform: translateY(-2px);
         }
 
@@ -226,7 +237,7 @@
         }
 
         .card-header i {
-            font-size: 2em;
+            font-size: 1.8em;
             color: var(--primary);
         }
 
@@ -321,7 +332,7 @@
         }
 
         .btn-secondary {
-            background: linear-gradient(135deg, var(--secondary) 0%, #7c3aed 100%);
+            background: linear-gradient(135deg, var(--secondary) 0%, #ec4899 100%);
             color: white;
         }
 
@@ -533,7 +544,7 @@
             border-radius: 12px;
             text-align: center;
             transition: all 0.3s;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 10px rgba(17, 12, 34, 0.08);
         }
 
         .stat-card:hover {
@@ -705,6 +716,31 @@
         }
 
         /* Responsive */
+        @media (max-width: 1024px) {
+            .layout {
+                grid-template-columns: 1fr;
+                gap: 16px;
+                padding: 16px;
+            }
+
+            .nav-tabs {
+                flex-direction: row;
+                position: static;
+                top: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+                border-radius: 12px;
+                overflow-x: auto;
+                gap: 8px;
+                padding: 10px;
+            }
+
+            .nav-tab {
+                min-width: 140px;
+                justify-content: center;
+            }
+        }
+
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 1.8em;
@@ -714,23 +750,8 @@
                 font-size: 1em;
             }
 
-            .nav-tab {
-                min-width: 120px;
-                padding: 15px 10px;
-                font-size: 13px;
-            }
-
-            .nav-tab span {
-                display: none;
-            }
-
-            .tab-content {
-                padding: 20px;
-            }
-
-            .card {
-                padding: 20px;
-            }
+            .tab-content { padding: 20px; }
+            .card { padding: 20px; }
 
             .form-grid {
                 grid-template-columns: 1fr;
@@ -893,34 +914,36 @@
             </div>
         </div>
 
-        <!-- Navigation -->
-        <div class="nav-tabs">
-            <button class="nav-tab active" onclick="switchTab('pipeline')">
-                <i class="fas fa-database"></i>
-                <span>Pipeline</span>
-            </button>
-            <button class="nav-tab" onclick="switchTab('analysis')">
-                <i class="fas fa-chart-line"></i>
-                <span>Analysis</span>
-            </button>
-            <button class="nav-tab" onclick="switchTab('clustering')">
-                <i class="fas fa-project-diagram"></i>
-                <span>Clustering</span>
-            </button>
-            <button class="nav-tab" onclick="switchTab('rag')">
-                <i class="fas fa-comments"></i>
-                <span>RAG Query</span>
-            </button>
-            <button class="nav-tab" onclick="switchTab('similarity')">
-                <i class="fas fa-search"></i>
-                <span>Search</span>
-            </button>
-            <button class="nav-tab" onclick="switchTab('visualizations')">
-                <i class="fas fa-chart-pie"></i>
-                <span>Visuals</span>
-            </button>
-        </div>
+        <!-- Layout: Sidebar + Main -->
+        <div class="layout">
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="switchTab('pipeline')">
+                    <i class="fas fa-database"></i>
+                    <span>Pipeline</span>
+                </button>
+                <button class="nav-tab" onclick="switchTab('analysis')">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Redundancy Analysis</span>
+                </button>
+                <button class="nav-tab" onclick="switchTab('clustering')">
+                    <i class="fas fa-project-diagram"></i>
+                    <span>Clustering</span>
+                </button>
+                <button class="nav-tab" onclick="switchTab('rag')">
+                    <i class="fas fa-comments"></i>
+                    <span>RAG Query</span>
+                </button>
+                <button class="nav-tab" onclick="switchTab('similarity')">
+                    <i class="fas fa-search"></i>
+                    <span>Search</span>
+                </button>
+                <button class="nav-tab" onclick="switchTab('visualizations')">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Visuals</span>
+                </button>
+            </div>
 
+            <div class="main-content">
         <!-- Pipeline Tab -->
         <div id="pipeline" class="tab-content active">
             <div class="card">
@@ -969,7 +992,7 @@ https://www.govinfo.gov/bulkdata/CFR/2025/title-17/">https://www.govinfo.gov/bul
             <div class="card">
                 <div class="card-header">
                     <i class="fas fa-microscope"></i>
-                    <h2>Semantic Analysis</h2>
+                    <h2>Redundancy Analysis</h2>
                 </div>
                 <p class="card-description">
                     Analyze semantic similarity, detect overlaps, check redundancy, and validate data integrity across different levels.
@@ -1174,6 +1197,8 @@ https://www.govinfo.gov/bulkdata/CFR/2025/title-17/">https://www.govinfo.gov/bul
                 </div>
             </div>
         </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -1189,7 +1214,11 @@ https://www.govinfo.gov/bulkdata/CFR/2025/title-17/">https://www.govinfo.gov/bul
             document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
             
             document.getElementById(tabName).classList.add('active');
-            event.target.closest('.nav-tab').classList.add('active');
+            // Ensure click works on icon/text inside button
+            if (event && event.target) {
+                const btn = event.target.closest('.nav-tab');
+                if (btn) btn.classList.add('active');
+            }
         }
 
         async function runPipeline() {
