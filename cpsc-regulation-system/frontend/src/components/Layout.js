@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppBar, Toolbar, Typography, Button, Box, Container } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -18,9 +18,15 @@ const Layout = ({ children }) => {
   };
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
       {isAuthenticated && (
-        <AppBar position="static">
+        <AppBar
+          position="sticky"
+          elevation={0}
+          sx={{
+            background: 'linear-gradient(90deg, #0b5cab 0%, #1976d2 100%)'
+          }}
+        >
           <Toolbar>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
               CPSC Regulation System
@@ -35,7 +41,7 @@ const Layout = ({ children }) => {
             {user?.role === 'admin' && (
               <Button
                 color="inherit"
-              onClick={() => handleNavigation('/admin-panel')}
+                onClick={() => handleNavigation('/admin-panel')}
                 sx={{ mr: 2 }}
               >
                 Admin
@@ -50,9 +56,9 @@ const Layout = ({ children }) => {
           </Toolbar>
         </AppBar>
       )}
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+      <Box component="main" sx={{ width: '100%', px: 0, py: 3 }}>
         {children}
-      </Container>
+      </Box>
     </Box>
   );
 };

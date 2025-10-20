@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Container,
   Paper,
   TextField,
   Button,
@@ -55,7 +54,7 @@ const UserDashboard = () => {
   };
 
   return (
-    <Container maxWidth="lg">
+    <Box sx={{ width: '100%', p: { xs: 2, md: 3 } }}>
       <Typography variant="h4" component="h1" gutterBottom>
         Search CPSC Regulations
       </Typography>
@@ -143,7 +142,7 @@ const UserDashboard = () => {
           </List>
         </Paper>
       )}
-
+      
       {searchResults.length === 0 && !loading && searchQuery && (
         <Paper elevation={2} sx={{ p: 3, textAlign: 'center' }}>
           <Typography variant="h6" color="textSecondary">
@@ -154,7 +153,7 @@ const UserDashboard = () => {
           </Typography>
         </Paper>
       )}
-    </Container>
+    </Box>
   );
 };
 

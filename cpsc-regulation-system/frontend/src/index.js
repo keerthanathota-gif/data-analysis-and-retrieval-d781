@@ -7,11 +7,35 @@ import App from './App';
 
 const theme = createTheme({
   palette: {
+    mode: 'light',
+    background: {
+      default: '#f7f8fa'
+    },
     primary: {
       main: '#1976d2',
     },
     secondary: {
-      main: '#dc004e',
+      main: '#6c7a89',
+    },
+  },
+  shape: {
+    borderRadius: 10,
+  },
+  components: {
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+        },
+      },
+      defaultProps: {
+        elevation: 1,
+      },
+    },
+    MuiAppBar: {
+      defaultProps: {
+        color: 'primary',
+      },
     },
   },
 });
