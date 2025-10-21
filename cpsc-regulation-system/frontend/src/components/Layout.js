@@ -17,8 +17,16 @@ const Layout = ({ children }) => {
     navigate(path);
   };
 
+  const isAuthPage = ['/login', '/signup', '/admin-login'].includes(location.pathname);
+
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        // Remove background color for auth pages so gradient fills edge-to-edge
+        bgcolor: isAuthPage ? 'transparent' : 'background.default',
+      }}
+    >
       {isAuthenticated && (
         <AppBar
           position="sticky"
@@ -56,7 +64,15 @@ const Layout = ({ children }) => {
           </Toolbar>
         </AppBar>
       )}
-      <Box component="main" sx={{ width: '100%', px: 0, py: 3 }}>
+      <Box
+        component="main"
+        sx={{
+          width: '100%',
+          px: 0,
+          // Remove vertical padding on auth pages to eliminate outside margins
+          py: isAuthPage ? 0 : 3,
+        }}
+      >
         {children}
       </Box>
     </Box>
