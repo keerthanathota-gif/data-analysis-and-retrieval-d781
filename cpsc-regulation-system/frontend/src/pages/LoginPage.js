@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import {
   Container,
   Paper,
@@ -16,15 +16,11 @@ import {
 } from '@mui/material';
 import { styled, keyframes } from '@mui/material/styles';
 import { useAuth } from '../contexts/AuthContext';
-import GoogleIcon from '@mui/icons-material/Google';
-import FacebookIcon from '@mui/icons-material/Facebook';
-import TwitterIcon from '@mui/icons-material/Twitter';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { authService } from '../services/authService';
-import { getOAuthUrl } from '../config/oauth-config';
+// Removed OAuth and provider-specific imports for a minimal login UI
 
 // Animations
 const float = keyframes`
@@ -106,17 +102,7 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   }
 }));
 
-const LogoText = styled(Typography)(({ theme }) => ({
-  background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
-  backgroundClip: 'text',
-  WebkitBackgroundClip: 'text',
-  color: 'transparent',
-  fontWeight: 'bold',
-  letterSpacing: '2px',
-  fontSize: '14px',
-  animation: `${float} 3s ease-in-out infinite`,
-  marginBottom: '8px'
-}));
+// Brand/Logo intentionally omitted per minimal design requirement
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
   '& .MuiOutlinedInput-root': {
@@ -173,22 +159,7 @@ const LoginButton = styled(Button)(({ theme }) => ({
   }
 }));
 
-const SocialButton = styled(IconButton)(({ theme, color }) => ({
-  width: '50px',
-  height: '50px',
-  borderRadius: '50%',
-  border: '2px solid rgba(147, 51, 234, 0.2)',
-  transition: 'all 0.3s ease',
-  backgroundColor: 'white',
-  color: color || '#667eea',
-  '&:hover': {
-    transform: 'translateY(-3px) scale(1.1)',
-    borderColor: color || '#667eea',
-    backgroundColor: color || '#667eea',
-    color: 'white',
-    boxShadow: `0 5px 15px ${color ? color + '40' : 'rgba(102, 126, 234, 0.4)'}`
-  }
-}));
+// Social buttons removed for minimal, provider-agnostic login
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -200,6 +171,21 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Determine safe redirect target (default to dashboard)
+  const redirectTarget = (() => {
+    try {
+      const params = new URLSearchParams(location.search);
+      const candidate = params.get('redirectUrl');
+      if (candidate && candidate.startsWith('/') && !candidate.startsWith('//')) {
+        return candidate;
+      }
+    } catch (_) {
+      // ignore parsing errors and fall back
+    }
+    return '/dashboard';
+  })();
 
   const handleChange = (e) => {
     setFormData({
@@ -215,7 +201,7 @@ const LoginPage = () => {
 
     try {
       await login(formData.username, formData.password);
-      navigate('/dashboard');
+      navigate(redirectTarget);
     } catch (err) {
       console.error('Login error:', err);
       const errorMessage = err.response?.data?.detail || 
@@ -228,43 +214,19 @@ const LoginPage = () => {
     }
   };
 
-  const handleOAuth = async (provider) => {
-    setError('');
-    setLoading(true);
-    try {
-      const { state, client_id } = await authService.oauthStart(provider);
-      
-      sessionStorage.setItem('oauth_state', state);
-      sessionStorage.setItem('oauth_provider', provider);
-      
-      if (client_id) {
-        const authUrl = getOAuthUrl(provider, state, client_id);
-        window.location.href = authUrl;
-      } else {
-        setError(`OAuth provider ${provider} is not configured.`);
-        setLoading(false);
-      }
-    } catch (error) {
-      console.error('OAuth start error:', error);
-      setError('Unable to start OAuth flow. Please try again.');
-      setLoading(false);
-    }
-  };
-
   return (
     <GradientContainer>
       <Container maxWidth="sm">
         <Grow in={true} timeout={800}>
           <StyledPaper elevation={0}>
             <Box sx={{ textAlign: 'center', mb: 3 }}>
-              <LogoText variant="subtitle1">CPSC</LogoText>
               <Fade in={true} timeout={1000}>
                 <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#1a1a1a', mb: 1 }}>
-                  Login
+                  Sign in
                 </Typography>
               </Fade>
               <Typography variant="body2" sx={{ color: 'rgba(0, 0, 0, 0.6)' }}>
-                Welcome back! Please enter your credentials.
+                Enter your account details to continue.
               </Typography>
             </Box>
             
@@ -337,14 +299,6 @@ const LoginPage = () => {
                   ),
                 }}
               />
-              
-              <Box sx={{ textAlign: 'right', mt: 1, mb: 2 }}>
-                <Link to="/forgot-password" style={{ textDecoration: 'none' }}>
-                  <Typography variant="caption" sx={{ color: '#9333ea', cursor: 'pointer' }}>
-                    Forgot password?
-                  </Typography>
-                </Link>
-              </Box>
 
               <LoginButton
                 type="submit"
@@ -356,30 +310,13 @@ const LoginPage = () => {
                 {loading ? (
                   <CircularProgress size={24} sx={{ color: 'white' }} />
                 ) : (
-                  'LOGIN'
+                  'Sign in'
                 )}
               </LoginButton>
 
-              <Box sx={{ textAlign: 'center', mb: 3 }}>
-                <Typography variant="body2" sx={{ color: 'rgba(0, 0, 0, 0.5)', mb: 2 }}>
-                  Or Sign Up Using
-                </Typography>
-                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
-                  <SocialButton color="#4267B2" onClick={() => handleOAuth('facebook')}>
-                    <FacebookIcon />
-                  </SocialButton>
-                  <SocialButton color="#1DA1F2" onClick={() => handleOAuth('twitter')}>
-                    <TwitterIcon />
-                  </SocialButton>
-                  <SocialButton color="#DB4437" onClick={() => handleOAuth('google')}>
-                    <GoogleIcon />
-                  </SocialButton>
-                </Box>
-              </Box>
-
               <Box sx={{ textAlign: 'center' }}>
                 <Typography variant="body2" sx={{ color: 'rgba(0, 0, 0, 0.5)', mb: 1 }}>
-                  Or Sign Up Using
+                  Don’t have an account?
                 </Typography>
                 <Link to="/signup" style={{ textDecoration: 'none' }}>
                   <Typography 
@@ -394,7 +331,7 @@ const LoginPage = () => {
                       }
                     }}
                   >
-                    SIGN UP
+                    Create account
                   </Typography>
                 </Link>
               </Box>
