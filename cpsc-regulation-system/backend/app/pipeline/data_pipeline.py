@@ -41,7 +41,7 @@ class DataPipeline:
         os.makedirs(self.output_dir, exist_ok=True)
         
         # Initialize database
-        init_db()
+        init_cfr_db()
         
         # Pipeline status tracking
         self.status = {
