@@ -89,7 +89,7 @@ async def get_all_users(
 async def update_user_role(
     user_id: int,
     new_role: UserRole,
-    current_user = Depends(get_admin_user),
+    current_user = Depends(get_current_active_user),
     auth_db: Session = Depends(get_auth_db)
 ):
     """Update user role"""
@@ -116,7 +116,7 @@ async def update_user_role(
 @router.put("/users/{user_id}/activate")
 async def activate_user(
     user_id: int,
-    current_user = Depends(get_admin_user),
+    current_user = Depends(get_current_active_user),
     auth_db: Session = Depends(get_auth_db)
 ):
     """Activate user"""
@@ -143,7 +143,7 @@ async def activate_user(
 @router.put("/users/{user_id}/deactivate")
 async def deactivate_user(
     user_id: int,
-    current_user = Depends(get_admin_user),
+    current_user = Depends(get_current_active_user),
     auth_db: Session = Depends(get_auth_db)
 ):
     """Deactivate user"""
@@ -172,7 +172,7 @@ async def get_activity_logs(
     user_id: int = None,
     skip: int = 0,
     limit: int = 100,
-    current_user = Depends(get_admin_user),
+    current_user = Depends(get_current_active_user),
     auth_db: Session = Depends(get_auth_db)
 ):
     """Get activity logs with optional user filter"""
@@ -189,7 +189,7 @@ async def get_activity_logs(
 async def run_pipeline(
     request: PipelineRequest,
     background_tasks: BackgroundTasks,
-    current_user = Depends(get_admin_user),
+    current_user = Depends(get_current_active_user),
     auth_db: Session = Depends(get_auth_db)
 ):
     """Run the complete data pipeline"""
@@ -242,7 +242,7 @@ async def run_pipeline(
 
 @router.get("/pipeline/status", response_model=PipelineStatus)
 async def get_pipeline_status(
-    current_user = Depends(get_admin_user)
+    current_user = Depends(get_current_active_user)
 ):
     """Get current pipeline status"""
     global pipeline_instance, pipeline_status_global
@@ -254,7 +254,7 @@ async def get_pipeline_status(
 
 @router.post("/pipeline/reset")
 async def reset_pipeline(
-    current_user = Depends(get_admin_user),
+    current_user = Depends(get_current_active_user),
     auth_db: Session = Depends(get_auth_db),
     cfr_db: Session = Depends(get_cfr_db)
 ):
@@ -295,7 +295,7 @@ async def reset_pipeline(
 @router.post("/analysis/run")
 async def run_analysis(
     level: str,
-    current_user = Depends(get_admin_user),
+    current_user = Depends(get_current_active_user),
     auth_db: Session = Depends(get_auth_db),
     cfr_db: Session = Depends(get_cfr_db)
 ):
@@ -326,7 +326,7 @@ async def run_analysis(
 async def run_clustering(
     level: str,
     n_clusters: int = None,
-    current_user = Depends(get_admin_user),
+    current_user = Depends(get_current_active_user),
     auth_db: Session = Depends(get_auth_db),
     cfr_db: Session = Depends(get_cfr_db)
 ):
