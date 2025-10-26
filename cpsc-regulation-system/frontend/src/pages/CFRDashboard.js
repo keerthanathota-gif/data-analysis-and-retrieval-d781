@@ -10,6 +10,9 @@ const CFRDashboard = () => {
   const [pipelineUrls, setPipelineUrls] = useState('https://www.govinfo.gov/bulkdata/CFR/2025/title-16/');
   const [pipelineLoading, setPipelineLoading] = useState(false);
   const [pipelineResults, setPipelineResults] = useState(null);
+  const [showPipelineResults, setShowPipelineResults] = useState(false);
+  const [pipelineProgress, setPipelineProgress] = useState(0);
+  const [completedSteps, setCompletedSteps] = useState([]);
 
   // Chat/RAG state
   const [chatMessages, setChatMessages] = useState([
@@ -93,6 +96,9 @@ const CFRDashboard = () => {
 
     setPipelineLoading(true);
     setPipelineResults(null);
+    setShowPipelineResults(true);
+    setPipelineProgress(0);
+    setCompletedSteps([]);
 
     try {
       const urls = pipelineUrls.split('\n').map(url => url.trim()).filter(url => url.length > 0);
@@ -131,9 +137,20 @@ const CFRDashboard = () => {
       const status = response.data;
 
       setPipelineResults(status);
+      
+      // Update progress
+      if (status.progress !== undefined) {
+        setPipelineProgress(status.progress);
+      }
+      
+      // Update completed steps
+      if (status.steps_completed && Array.isArray(status.steps_completed)) {
+        setCompletedSteps(status.steps_completed);
+      }
 
       if (status.state === 'completed') {
         setPipelineLoading(false);
+        setPipelineProgress(100);
         await loadStats();
       } else if (status.state === 'error') {
         setPipelineLoading(false);
@@ -433,15 +450,17 @@ const CFRDashboard = () => {
       <div className="dashboard-layout">
         {/* Navigation Tabs */}
         <div className="nav-tabs">
-          <button className={`nav-tab ${activeTab === 'pipeline' ? 'active' : ''}`} onClick={() => setActiveTab('pipeline')}>
-            Pipeline
-          </button>
-          <button className={`nav-tab ${activeTab === 'advanced' ? 'active' : ''}`} onClick={() => setActiveTab('advanced')}>
-            Analysis
-          </button>
-          <button className={`nav-tab ${activeTab === 'rag' ? 'active' : ''}`} onClick={() => setActiveTab('rag')}>
-            RAG Query
-          </button>
+          <div className="tabs-container">
+            <button className={`nav-tab ${activeTab === 'pipeline' ? 'active' : ''}`} onClick={() => setActiveTab('pipeline')}>
+              Pipeline
+            </button>
+            <button className={`nav-tab ${activeTab === 'advanced' ? 'active' : ''}`} onClick={() => setActiveTab('advanced')}>
+              Analysis
+            </button>
+            <button className={`nav-tab ${activeTab === 'rag' ? 'active' : ''}`} onClick={() => setActiveTab('rag')}>
+              RAG Query
+            </button>
+          </div>
         </div>
 
         {/* Content Area */}
