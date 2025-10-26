@@ -263,16 +263,33 @@ async def reset_pipeline(
         import shutil
         from app.config import DATA_DIR, OUTPUT_DIR, VISUALIZATIONS_DIR
         import os
+        import time
 
         # Reset CFR database only
         from app.models.cfr_database import reset_cfr_db
         reset_cfr_db()
 
-        # Clear data directories
+        # Clear data directories with proper error handling
         for directory in [DATA_DIR, OUTPUT_DIR, VISUALIZATIONS_DIR]:
-            if os.path.exists(directory):
-                shutil.rmtree(directory)
-                os.makedirs(directory)
+            try:
+                if os.path.exists(directory):
+                    # Use ignore_errors to handle any file locking issues
+                    shutil.rmtree(directory, ignore_errors=True)
+                    # Small delay to ensure filesystem sync
+                    time.sleep(0.1)
+                
+                # Recreate the directory with exist_ok=True for safety
+                os.makedirs(directory, exist_ok=True)
+                
+                # Verify directory is writable
+                if not os.access(directory, os.W_OK):
+                    raise PermissionError(f"Directory {directory} is not writable after recreation")
+                    
+                print(f"Reset and recreated directory: {directory}")
+            except Exception as e:
+                print(f"Warning: Error handling directory {directory}: {e}")
+                # Try to ensure directory exists even if deletion failed
+                os.makedirs(directory, exist_ok=True)
 
         # Log activity
         auth_service.log_activity(
@@ -287,9 +304,13 @@ async def reset_pipeline(
             "status": "success"
         }
     except Exception as e:
+        import traceback
+        error_details = f"{type(e).__name__}: {str(e)}"
+        print(f"Reset error: {error_details}")
+        print(f"Traceback: {traceback.format_exc()}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Reset failed: {str(e)}"
+            detail=f"Reset failed: {error_details}"
         )
 
 @router.post("/analysis/run")

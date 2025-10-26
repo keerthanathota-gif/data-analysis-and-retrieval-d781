@@ -58,16 +58,26 @@ def download_and_extract_zip(url, extract_to='./data'):
                 base_filename = base_filename.replace('"', '_').replace('<', '_').replace('>', '_')
                 base_filename = base_filename.replace('|', '_')
                 
-                # Create target path using absolute path
-                target_path = os.path.abspath(os.path.join(extract_to, base_filename))
+                # Create target path using absolute path with forward slashes for cross-platform compatibility
+                target_path = os.path.abspath(os.path.join(extract_to, base_filename)).replace('\\', '/')
+                
+                # Additional validation for problematic characters
+                if ':' in os.path.basename(target_path):
+                    print(f"  SKIPPING: Invalid filename (contains colon): {base_filename}")
+                    continue
                 
                 print(f"  Extracting: {base_filename} -> {target_path}")
                 
                 # Extract the file
-                with zip_file.open(member) as source:
-                    file_content = source.read()
-                    with open(target_path, 'wb') as target:
-                        target.write(file_content)
+                try:
+                    with zip_file.open(member) as source:
+                        file_content = source.read()
+                        with open(target_path, 'wb') as target:
+                            target.write(file_content)
+                except OSError as e:
+                    print(f"  ERROR extracting {member} [Errno {e.errno}]: {str(e)}")
+                    print(f"  Hint: Check for invalid characters in filename or path issues")
+                    raise
             except Exception as e:
                 print(f"  ERROR extracting {member}: {type(e).__name__}: {str(e)}")
                 # Continue with other files instead of failing completely
