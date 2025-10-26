@@ -58,8 +58,8 @@ def download_and_extract_zip(url, extract_to='./data'):
                 base_filename = base_filename.replace('"', '_').replace('<', '_').replace('>', '_')
                 base_filename = base_filename.replace('|', '_')
                 
-                # Create target path using absolute path with forward slashes for cross-platform compatibility
-                target_path = os.path.abspath(os.path.join(extract_to, base_filename)).replace('\\', '/')
+                # Create target path using absolute path - let Python handle path separators
+                target_path = os.path.abspath(os.path.join(extract_to, base_filename))
                 
                 # Additional validation for problematic characters
                 if ':' in os.path.basename(target_path):

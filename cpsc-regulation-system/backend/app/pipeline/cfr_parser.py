@@ -73,8 +73,8 @@ def parse_chapter_subchapter_part_sections(xml_file):
 def save_json(data, output_file):
     """Save data to JSON file."""
     try:
-        # Normalize and resolve the output path - use forward slashes for cross-platform compatibility
-        output_file = os.path.abspath(output_file).replace('\\', '/')
+        # Normalize and resolve the output path - let Python handle path separators
+        output_file = os.path.abspath(output_file)
         # Ensure the directory exists
         output_dir = os.path.dirname(output_file)
         if output_dir:  # Only create directory if there's a path
@@ -105,8 +105,8 @@ def save_json(data, output_file):
 def save_csv(data, output_file):
     """Save data to CSV file."""
     try:
-        # Normalize and resolve the output path - use forward slashes for cross-platform compatibility
-        output_file = os.path.abspath(output_file).replace('\\', '/')
+        # Normalize and resolve the output path - let Python handle path separators
+        output_file = os.path.abspath(output_file)
         # Ensure the directory exists
         output_dir = os.path.dirname(output_file)
         if output_dir:  # Only create directory if there's a path
