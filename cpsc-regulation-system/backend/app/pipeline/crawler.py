@@ -8,18 +8,48 @@ from app.config import CRAWL_URLS
 def download_and_extract_zip(url, extract_to='./data'):
     """
     Downloads a zip file from the given URL and extracts its contents.
+    Handles Windows-specific path issues.
     """
+    # Ensure the extract path exists and is properly formatted
+    extract_to = os.path.abspath(extract_to)
     if not os.path.exists(extract_to):
-        os.makedirs(extract_to)
+        os.makedirs(extract_to, exist_ok=True)
 
     print(f"Downloading from {url}")
-    response = requests.get(url)
-    response.raise_for_status()  # Raise an exception for bad status codes
+    try:
+        response = requests.get(url, timeout=30)
+        response.raise_for_status()  # Raise an exception for bad status codes
+    except requests.RequestException as e:
+        print(f"Error downloading from {url}: {e}")
+        raise
 
-    zip_file = zipfile.ZipFile(io.BytesIO(response.content))
-    zip_file.extractall(extract_to)
-    print(f"Extracted to {extract_to}")
-    return extract_to
+    try:
+        zip_file = zipfile.ZipFile(io.BytesIO(response.content))
+        
+        # Extract files one by one to handle Windows path issues
+        for member in zip_file.namelist():
+            # Sanitize filename for Windows
+            filename = member.replace('\\', '/').strip()
+            if not filename:
+                continue
+                
+            # Skip directory entries
+            if filename.endswith('/'):
+                continue
+                
+            # Create target path
+            target_path = os.path.join(extract_to, os.path.basename(filename))
+            
+            # Extract the file
+            with zip_file.open(member) as source:
+                with open(target_path, 'wb') as target:
+                    target.write(source.read())
+        
+        print(f"Extracted to {extract_to}")
+        return extract_to
+    except (zipfile.BadZipFile, OSError, IOError) as e:
+        print(f"Error extracting zip file: {e}")
+        raise
 
 if __name__ == "__main__":
     download_path = "./cfr_data"
