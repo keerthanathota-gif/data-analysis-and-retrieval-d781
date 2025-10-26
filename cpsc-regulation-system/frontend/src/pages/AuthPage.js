@@ -632,15 +632,15 @@ const AuthPage = () => {
       </LeftPanel>
 
       <RightPanel>
-        <Box sx={{ maxWidth: '550px', position: 'relative', zIndex: 1 }}>
+        <Box sx={{ maxWidth: '550px', position: 'relative', zIndex: 1, mt: 4 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
-            <BoltIcon sx={{ fontSize: '32px' }} />
-            <Typography variant="h6" sx={{ fontWeight: 'bold', letterSpacing: '1px' }}>
+            <BoltIcon sx={{ fontSize: '28px' }} />
+            <Typography variant="h6" sx={{ fontWeight: 'bold', letterSpacing: '0.5px', fontSize: '1.1rem' }}>
               AI-Powered Regulatory Intelligence
             </Typography>
           </Box>
           
-          <Typography variant="h3" sx={{ fontWeight: 'bold', mb: 3, lineHeight: 1.2 }}>
+          <Typography variant="h3" sx={{ fontWeight: 'bold', mb: 3, lineHeight: 1.3, fontSize: '2.2rem' }}>
             Transform how you navigate federal regulations
           </Typography>
           
@@ -690,20 +690,6 @@ const AuthPage = () => {
             </Box>
           </FeatureCard>
 
-          <Box sx={{ display: 'flex', gap: 8, mt: 5 }}>
-            <Box>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 0.5 }}>99.9%</Typography>
-              <Typography variant="body2" sx={{ opacity: 0.9 }}>Accuracy Rate</Typography>
-            </Box>
-            <Box>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 0.5 }}>10K+</Typography>
-              <Typography variant="body2" sx={{ opacity: 0.9 }}>Users</Typography>
-            </Box>
-            <Box>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 0.5 }}>24/7</Typography>
-              <Typography variant="body2" sx={{ opacity: 0.9 }}>Support</Typography>
-            </Box>
-          </Box>
 
           <Box sx={{ mt: 5, pt: 4, borderTop: '1px solid rgba(255,255,255,0.2)' }}>
             <Typography variant="caption" sx={{ opacity: 0.7, display: 'block', mb: 1 }}>
