@@ -9,15 +9,28 @@ def download_and_extract_zip(url, extract_to='./data'):
     """
     Downloads a zip file from the given URL and extracts its contents.
     """
+    # Ensure extract_to is an absolute path and properly formatted
+    extract_to = os.path.abspath(extract_to)
+    
     if not os.path.exists(extract_to):
-        os.makedirs(extract_to)
+        os.makedirs(extract_to, exist_ok=True)
 
     print(f"Downloading from {url}")
-    response = requests.get(url)
+    response = requests.get(url, timeout=300)  # 5 minute timeout
     response.raise_for_status()  # Raise an exception for bad status codes
 
+    print(f"Extracting to {extract_to}")
     zip_file = zipfile.ZipFile(io.BytesIO(response.content))
-    zip_file.extractall(extract_to)
+    
+    # Extract with proper path handling
+    for member in zip_file.namelist():
+        # Sanitize filename to avoid path issues on Windows
+        member_path = os.path.join(extract_to, member)
+        member_path = os.path.normpath(member_path)
+        
+        # Extract the member
+        zip_file.extract(member, extract_to)
+    
     print(f"Extracted to {extract_to}")
     return extract_to
 

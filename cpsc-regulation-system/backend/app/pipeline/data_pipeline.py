@@ -160,16 +160,19 @@ class DataPipeline:
             print("  No XML files found in data directory")
             return []
         
+        # Ensure output directory exists before saving files
+        os.makedirs(self.output_dir, exist_ok=True)
+        
         parsed_data_list = []
         for xml_file in xml_files:
             try:
                 print(f"  Parsing: {os.path.basename(xml_file)}")
                 parsed_data = parse_chapter_subchapter_part_sections(xml_file)
                 
-                # Save JSON and CSV outputs
+                # Save JSON and CSV outputs with absolute paths
                 base_name = os.path.splitext(os.path.basename(xml_file))[0]
-                json_output = os.path.join(self.output_dir, f"{base_name}.json")
-                csv_output = os.path.join(self.output_dir, f"{base_name}.csv")
+                json_output = os.path.abspath(os.path.join(self.output_dir, f"{base_name}.json"))
+                csv_output = os.path.abspath(os.path.join(self.output_dir, f"{base_name}.csv"))
                 
                 save_json(parsed_data, json_output)
                 save_csv(parsed_data, csv_output)
@@ -178,6 +181,8 @@ class DataPipeline:
                 print(f"    ✓ Saved to {json_output} and {csv_output}")
             except Exception as e:
                 print(f"    ✗ Error parsing {xml_file}: {e}")
+                import traceback
+                traceback.print_exc()
         
         return parsed_data_list
     
