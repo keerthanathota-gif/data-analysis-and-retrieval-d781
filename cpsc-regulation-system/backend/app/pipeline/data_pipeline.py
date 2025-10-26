@@ -79,9 +79,11 @@ class DataPipeline:
         if state:
             self.status['state'] = state
             if state == 'running' and not self.status['start_time']:
-                self.status['start_time'] = datetime.now()
+                # Store datetime as ISO format string to avoid serialization issues
+                self.status['start_time'] = datetime.now().isoformat()
             elif state in ['completed', 'error']:
-                self.status['end_time'] = datetime.now()
+                # Store datetime as ISO format string to avoid serialization issues
+                self.status['end_time'] = datetime.now().isoformat()
         
         if current_step:
             self.status['current_step'] = current_step

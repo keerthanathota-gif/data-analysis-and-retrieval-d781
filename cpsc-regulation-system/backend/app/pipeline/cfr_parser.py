@@ -73,8 +73,8 @@ def parse_chapter_subchapter_part_sections(xml_file):
 def save_json(data, output_file):
     """Save data to JSON file."""
     try:
-        # Normalize and resolve the output path
-        output_file = os.path.abspath(output_file)
+        # Normalize and resolve the output path - use forward slashes for cross-platform compatibility
+        output_file = os.path.abspath(output_file).replace('\\', '/')
         # Ensure the directory exists
         output_dir = os.path.dirname(output_file)
         if output_dir:  # Only create directory if there's a path
@@ -84,8 +84,18 @@ def save_json(data, output_file):
         if not os.access(output_dir, os.W_OK):
             raise PermissionError(f"Directory {output_dir} is not writable")
         
+        # Additional validation for problematic characters
+        if ':' in os.path.basename(output_file):
+            raise ValueError(f"Invalid filename (contains colon): {os.path.basename(output_file)}")
+        
         with open(output_file, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
+    except OSError as e:
+        print(f"ERROR in save_json [Errno {e.errno}]: {str(e)}")
+        print(f"  output_file: {output_file}")
+        print(f"  output_dir: {output_dir if 'output_dir' in locals() else 'N/A'}")
+        print(f"  Hint: Check for invalid characters in filename or path length issues")
+        raise
     except Exception as e:
         print(f"ERROR in save_json: {type(e).__name__}: {str(e)}")
         print(f"  output_file: {output_file}")
@@ -95,8 +105,8 @@ def save_json(data, output_file):
 def save_csv(data, output_file):
     """Save data to CSV file."""
     try:
-        # Normalize and resolve the output path
-        output_file = os.path.abspath(output_file)
+        # Normalize and resolve the output path - use forward slashes for cross-platform compatibility
+        output_file = os.path.abspath(output_file).replace('\\', '/')
         # Ensure the directory exists
         output_dir = os.path.dirname(output_file)
         if output_dir:  # Only create directory if there's a path
@@ -105,6 +115,10 @@ def save_csv(data, output_file):
         # Verify the path is writable
         if not os.access(output_dir, os.W_OK):
             raise PermissionError(f"Directory {output_dir} is not writable")
+        
+        # Additional validation for problematic characters
+        if ':' in os.path.basename(output_file):
+            raise ValueError(f"Invalid filename (contains colon): {os.path.basename(output_file)}")
         
         with open(output_file, 'w', newline='', encoding='utf-8') as f:
             writer = csv.writer(f)
@@ -126,6 +140,12 @@ def save_csv(data, output_file):
                                 section.get("citation", ""),
                                 section.get("section_label", "")
                             ])
+    except OSError as e:
+        print(f"ERROR in save_csv [Errno {e.errno}]: {str(e)}")
+        print(f"  output_file: {output_file}")
+        print(f"  output_dir: {output_dir if 'output_dir' in locals() else 'N/A'}")
+        print(f"  Hint: Check for invalid characters in filename or path length issues")
+        raise
     except Exception as e:
         print(f"ERROR in save_csv: {type(e).__name__}: {str(e)}")
         print(f"  output_file: {output_file}")

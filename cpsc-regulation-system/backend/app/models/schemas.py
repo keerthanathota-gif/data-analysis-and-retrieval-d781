@@ -94,8 +94,8 @@ class PipelineStatus(BaseModel):
     total_steps: int
     steps_completed: List[str]
     error_message: Optional[str] = None
-    start_time: Optional[datetime] = None
-    end_time: Optional[datetime] = None
+    start_time: Optional[str] = None  # Changed to str (ISO format) to avoid serialization issues
+    end_time: Optional[str] = None    # Changed to str (ISO format) to avoid serialization issues
     stats: dict
 
 # Analysis schemas
