@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 import './CFRDashboard.css';
 
 const CFRDashboard = () => {
+  const navigate = useNavigate();
+  const { logout } = useAuth();
   const [activeTab, setActiveTab] = useState('rag');
   const [stats, setStats] = useState({ chapters: 0, sections: 0, embeddings: 0 });
 
@@ -407,10 +411,18 @@ const CFRDashboard = () => {
     };
   };
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
     if (window.confirm('Are you sure you want to sign out?')) {
-      localStorage.removeItem('token');
-      window.location.href = '/login';
+      try {
+        await logout();
+        navigate('/login', { replace: true });
+      } catch (error) {
+        console.error('Sign out error:', error);
+        // Even if logout fails, clear local storage and redirect
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        navigate('/login', { replace: true });
+      }
     }
   };
 
