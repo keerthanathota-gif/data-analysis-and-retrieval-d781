@@ -67,17 +67,20 @@ class ActivityLog(Base):
 
 # Database initialization with proper connection handling
 import os
+from sqlalchemy.pool import NullPool
+
 connect_args = {"check_same_thread": False}
 if os.name == 'nt':  # Additional Windows-specific settings
     connect_args['timeout'] = 30
+    connect_args['isolation_level'] = None  # Autocommit mode for SQLite on Windows
 
+# Use NullPool for SQLite to avoid connection pooling issues
 engine = create_engine(
-    AUTH_DATABASE_URL, 
+    AUTH_DATABASE_URL,
     echo=False,
     connect_args=connect_args,
-    pool_pre_ping=True,
-    pool_size=10,
-    max_overflow=20
+    poolclass=NullPool,  # No connection pooling for SQLite
+    pool_pre_ping=True
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
