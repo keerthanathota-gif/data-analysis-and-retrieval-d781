@@ -4,7 +4,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import AuthPage from './pages/AuthPage';
 import OAuthCallbackPage from './pages/OAuthCallbackPage';
-import PastelDashboard from './pages/PastelDashboard';
+import CFRDashboard_85063ac from './pages/CFRDashboard_85063ac';
 import Layout from './components/Layout';
 
 function App() {
@@ -18,7 +18,7 @@ function App() {
           path="/dashboard" 
           element={
             <ProtectedRoute>
-              <PastelDashboard />
+              <CFRDashboard_85063ac />
             </ProtectedRoute>
           } 
         />
