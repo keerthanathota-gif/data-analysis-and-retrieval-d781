@@ -143,6 +143,12 @@
             margin: 0 auto;
         }
 
+        .rag-layout > div:first-child {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
         .chat-container {
             background: white;
             border-radius: 12px;
@@ -429,13 +435,14 @@
 
         /* Quick Queries */
         .quick-queries {
-            margin-top: 16px;
+            margin-top: 0;
         }
 
         .quick-queries h4 {
             font-size: 14px;
             font-weight: 600;
             margin-bottom: 12px;
+            color: var(--text);
         }
 
         .quick-query-btn {
@@ -864,8 +871,12 @@
                 grid-template-columns: 1fr;
             }
 
+            .rag-layout > div:first-child {
+                order: 2;
+            }
+
             .sidebar {
-                grid-row: 1;
+                order: 1;
             }
         }
 
@@ -1091,8 +1102,10 @@
         <!-- RAG Query Tab -->
         <div id="rag-tab" class="main-content">
             <div class="rag-layout">
-                <!-- Chat Container -->
-                <div class="chat-container">
+                <!-- Left Column: Chat + Quick Queries -->
+                <div>
+                    <!-- Chat Container -->
+                    <div class="chat-container">
                     <div class="chat-header">
                         <div class="chat-icon">💬</div>
                         <div class="chat-title">
@@ -1122,26 +1135,29 @@
                             <span style="font-size: 20px;">➤</span>
                         </button>
                     </div>
+                </div>
 
-                    <!-- Quick Queries -->
-                    <div class="quick-queries">
-                        <h4>Quick Queries</h4>
-                        <button class="quick-query-btn" onclick="useQuickQuery('What are the main regulations in Chapter 1?')">
-                            <span>🔍</span>
-                            <span>What are the main regulations in Chapter 1?</span>
-                        </button>
-                        <button class="quick-query-btn" onclick="useQuickQuery('Summarize recent changes')">
-                            <span>📝</span>
-                            <span>Summarize recent changes</span>
-                        </button>
-                        <button class="quick-query-btn" onclick="useQuickQuery('Find regulations about consumer protection')">
-                            <span>🛡️</span>
-                            <span>Find regulations about consumer protection</span>
-                        </button>
-                        <button class="quick-query-btn" onclick="useQuickQuery('List all safety requirements')">
-                            <span>✅</span>
-                            <span>List all safety requirements</span>
-                        </button>
+                    <!-- Quick Queries - Moved below chat container -->
+                    <div class="chat-container">
+                        <div class="quick-queries">
+                            <h4>Quick Queries</h4>
+                            <button class="quick-query-btn" onclick="useQuickQuery('What are the main regulations in Chapter 1?')">
+                                <span>🔍</span>
+                                <span>What are the main regulations in Chapter 1?</span>
+                            </button>
+                            <button class="quick-query-btn" onclick="useQuickQuery('Summarize recent changes')">
+                                <span>📝</span>
+                                <span>Summarize recent changes</span>
+                            </button>
+                            <button class="quick-query-btn" onclick="useQuickQuery('Find regulations about consumer protection')">
+                                <span>🛡️</span>
+                                <span>Find regulations about consumer protection</span>
+                            </button>
+                            <button class="quick-query-btn" onclick="useQuickQuery('List all safety requirements')">
+                                <span>✅</span>
+                                <span>List all safety requirements</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
