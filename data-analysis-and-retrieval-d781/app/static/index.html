@@ -80,55 +80,48 @@
             background: var(--input-bg);
         }
 
-        /* Tabs - Modern Minimal Design */
+        /* Tabs - Capsule Design */
         .tabs {
             background: linear-gradient(to bottom, #ffffff 0%, #faf5ff 100%);
             padding: 20px 32px;
             display: flex;
             justify-content: center;
-            gap: 12px;
             border-bottom: none;
         }
 
-        .tab {
-            padding: 14px 32px;
+        .tabs-container {
+            display: inline-flex;
+            gap: 8px;
             background: white;
+            padding: 6px;
+            border-radius: 50px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
             border: 1px solid #f3e8ff;
-            border-radius: 12px;
+        }
+
+        .tab {
+            padding: 10px 28px;
+            background: transparent;
+            border: none;
+            border-radius: 50px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             color: #6b7280;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            white-space: nowrap;
         }
 
         .tab:hover {
             color: var(--text);
             background: #faf5ff;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(139, 92, 246, 0.1);
         }
 
         .tab.active {
-            color: var(--primary);
+            color: var(--text);
             background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
-            border-color: var(--primary);
-            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60%;
-            height: 3px;
-            background: var(--primary);
-            border-radius: 2px;
+            box-shadow: 0 2px 6px rgba(139, 92, 246, 0.15);
         }
 
         /* Main Content */
@@ -931,9 +924,11 @@
 
     <!-- Tabs -->
     <div class="tabs">
-        <button class="tab active" onclick="switchTab('pipeline')">Pipeline</button>
-        <button class="tab" onclick="switchTab('analysis')">Analysis</button>
-        <button class="tab" onclick="switchTab('rag')">RAG Query</button>
+        <div class="tabs-container">
+            <button class="tab active" onclick="switchTab('pipeline')">Pipeline</button>
+            <button class="tab" onclick="switchTab('analysis')">Analysis</button>
+            <button class="tab" onclick="switchTab('rag')">RAG Query</button>
+        </div>
     </div>
 
     <div class="container">
