@@ -197,3 +197,67 @@ async def get_sections_list(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error getting sections list: {str(e)}"
         )
+
+@router.get("/stats")
+async def get_search_stats(cfr_db: Session = Depends(get_cfr_db)):
+    """Get database statistics for search interface"""
+    try:
+        from app.models.cfr_database import Section, Chapter, Subchapter, SectionEmbedding, ChapterEmbedding, SubchapterEmbedding
+
+        total_sections = cfr_db.query(Section).count()
+        total_chapters = cfr_db.query(Chapter).count()
+        total_subchapters = cfr_db.query(Subchapter).count()
+        total_embeddings = (
+            cfr_db.query(SectionEmbedding).count() +
+            cfr_db.query(ChapterEmbedding).count() +
+            cfr_db.query(SubchapterEmbedding).count()
+        )
+
+        return {
+            "total_sections": total_sections,
+            "total_chapters": total_chapters,
+            "total_subchapters": total_subchapters,
+            "total_embeddings": total_embeddings
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error getting stats: {str(e)}"
+        )
+
+@router.post("/analysis/advanced")
+async def run_advanced_analysis(
+    request: dict,
+    current_user = Depends(get_current_active_user),
+    auth_db: Session = Depends(get_auth_db),
+    cfr_db: Session = Depends(get_cfr_db)
+):
+    """Run advanced analysis (redundancy, parity, overlap detection)"""
+    try:
+        from app.services.analysis_service import AnalysisService
+        analysis_service = AnalysisService()
+
+        level = request.get("level", "section")
+        max_items = request.get("max_items", 100)
+
+        results = analysis_service.analyze_semantic_similarity(level, cfr_db, max_pairs=max_items)
+
+        # Log activity
+        auth_service.log_activity(
+            db=auth_db,
+            user_id=current_user.id,
+            action="advanced_analysis",
+            details=f"User {current_user.username} ran advanced analysis on {level} level"
+        )
+
+        return {
+            "level": level,
+            "max_items": max_items,
+            "total_pairs": len(results),
+            "results": results
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error running advanced analysis: {str(e)}"
+        )
