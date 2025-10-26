@@ -65,14 +65,30 @@ class ActivityLog(Base):
     # Relationships
     user = relationship("User", back_populates="activity_logs")
 
-# Database initialization
-engine = create_engine(AUTH_DATABASE_URL, echo=False)
+# Database initialization with proper connection handling
+import os
+connect_args = {"check_same_thread": False}
+if os.name == 'nt':  # Additional Windows-specific settings
+    connect_args['timeout'] = 30
+
+engine = create_engine(
+    AUTH_DATABASE_URL, 
+    echo=False,
+    connect_args=connect_args,
+    pool_pre_ping=True,
+    pool_size=10,
+    max_overflow=20
+)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 def init_auth_db():
     """Initialize authentication database and create all tables"""
-    Base.metadata.create_all(bind=engine)
-    print("Authentication database initialized")
+    try:
+        Base.metadata.create_all(bind=engine)
+        print(f"✓ Authentication database initialized successfully")
+    except Exception as e:
+        print(f"✗ Error initializing authentication database: {e}")
+        raise
 
 def reset_auth_db():
     """Reset authentication database - drop all tables and recreate"""

@@ -3,9 +3,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AdminRoute } from './components/AdminRoute';
-import LoginPage from './pages/LoginPage';
+import AuthPage from './pages/AuthPage';
 import AdminLoginPage from './pages/AdminLoginPage';
-import SignupPage from './pages/SignupPage';
 import OAuthCallbackPage from './pages/OAuthCallbackPage';
 import UserDashboard from './pages/UserDashboard';
 import AdminDashboard from './pages/AdminDashboard';
@@ -16,8 +15,8 @@ function App() {
     <AuthProvider>
       <Layout>
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/login" element={<AuthPage />} />
+          <Route path="/signup" element={<AuthPage />} />
           <Route path="/oauth-callback" element={<OAuthCallbackPage />} />
           <Route path="/admin-login" element={<AdminLoginPage />} />
           <Route 
