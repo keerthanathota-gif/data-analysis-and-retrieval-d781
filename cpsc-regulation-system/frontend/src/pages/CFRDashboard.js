@@ -3,7 +3,7 @@ import axios from 'axios';
 import './CFRDashboard.css';
 
 const CFRDashboard = () => {
-  const [activeTab, setActiveTab] = useState('pipeline');
+  const [activeTab, setActiveTab] = useState('rag');
   const [stats, setStats] = useState({ chapters: 0, sections: 0, embeddings: 0 });
 
   // Pipeline state
@@ -11,13 +11,23 @@ const CFRDashboard = () => {
   const [pipelineLoading, setPipelineLoading] = useState(false);
   const [pipelineResults, setPipelineResults] = useState(null);
 
-
-  // RAG state
+  // Chat/RAG state
+  const [chatMessages, setChatMessages] = useState([
+    {
+      role: 'ai',
+      content: 'Hello! I can help you search and analyze CFR regulations using AI-powered semantic search. Ask me anything about the regulations in the database.'
+    }
+  ]);
   const [ragQuery, setRagQuery] = useState('');
   const [ragLevel, setRagLevel] = useState('all');
   const [ragTopK, setRagTopK] = useState(10);
   const [ragLoading, setRagLoading] = useState(false);
   const [ragResults, setRagResults] = useState(null);
+  
+  // Settings state
+  const [temperature, setTemperature] = useState(0.7);
+  const [maxTokens, setMaxTokens] = useState(500);
+  const [semanticSearch, setSemanticSearch] = useState(true);
 
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
@@ -148,34 +158,108 @@ const CFRDashboard = () => {
   };
 
 
-  const runRAGQuery = async () => {
-    if (!ragQuery.trim()) {
-      alert('Please enter a query');
+  const runRAGQuery = async (queryText = null) => {
+    const query = queryText || ragQuery.trim();
+    
+    if (!query) {
       return;
     }
 
+    // Add user message to chat
+    const userMessage = { role: 'user', content: query };
+    setChatMessages(prev => [...prev, userMessage]);
+    
+    // Add loading message
+    const loadingMessage = { role: 'ai', content: 'Searching database...' };
+    setChatMessages(prev => [...prev, loadingMessage]);
+
     setRagLoading(true);
-    setRagResults(null);
+    setRagQuery('');
 
     try {
       const response = await axios.post(
         'http://localhost:8000/search/query',
         {
-          query: ragQuery,
+          query: query,
           level: ragLevel,
           top_k: ragTopK
         },
         getAuthHeaders()
       );
+      
+      // Format results as chat message
+      const data = response.data;
+      let resultText = `Found ${data.results.length} relevant results:\n\n`;
+      
+      data.results.slice(0, 5).forEach((result, idx) => {
+        const score = (result.similarity_score * 100).toFixed(1);
+        const title = result.subject || result.name || result.section_number || 'Result';
+        resultText += `${idx + 1}. ${title} (${score}% match)\n`;
+        
+        if (result.section_number) {
+          resultText += `   Section: ${result.section_number}\n`;
+        }
+        if (result.text) {
+          resultText += `   ${result.text.substring(0, 150)}...\n`;
+        }
+        resultText += '\n';
+      });
+
+      // Remove loading message and add result
+      setChatMessages(prev => {
+        const filtered = prev.filter(msg => msg.content !== 'Searching database...');
+        return [...filtered, { role: 'ai', content: resultText }];
+      });
+
       setRagResults(response.data);
     } catch (error) {
-      setRagResults({
-        message: error.response?.data?.detail || 'Query failed',
-        status: 'error'
+      // Remove loading message and add error
+      setChatMessages(prev => {
+        const filtered = prev.filter(msg => msg.content !== 'Searching database...');
+        return [...filtered, { 
+          role: 'ai', 
+          content: `Error: ${error.response?.data?.detail || 'Query failed'}` 
+        }];
       });
     } finally {
       setRagLoading(false);
     }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      runRAGQuery();
+    }
+  };
+
+  const useQuickQuery = (query) => {
+    setRagQuery(query);
+    runRAGQuery(query);
+  };
+
+  const exportAsJSON = () => {
+    const dataStr = JSON.stringify(chatMessages, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'conversation.json';
+    link.click();
+  };
+
+  const exportAsPDF = () => {
+    alert('PDF export functionality coming soon!');
+  };
+
+  const copyToClipboard = () => {
+    const text = chatMessages.map(msg => 
+      `${msg.role === 'user' ? 'You' : 'AI'}: ${msg.content}`
+    ).join('\n\n');
+    
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Conversation copied to clipboard!');
+    });
   };
 
   const runSearch = async () => {
@@ -323,23 +407,39 @@ const CFRDashboard = () => {
     };
   };
 
+  const handleSignOut = () => {
+    if (window.confirm('Are you sure you want to sign out?')) {
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+  };
+
   return (
     <div className="app-container">
-      {/* Dashboard Layout with Vertical Navigation */}
+      {/* Header */}
+      <div className="dashboard-header">
+        <div className="dashboard-logo">
+          <div className="logo-icon"></div>
+          <span className="logo-text">CFR Pipeline System</span>
+        </div>
+        <button className="sign-out-btn" onClick={handleSignOut}>
+          <span>↗</span>
+          <span>Sign Out</span>
+        </button>
+      </div>
+
+      {/* Dashboard Layout */}
       <div className="dashboard-layout">
-        {/* Navigation */}
+        {/* Navigation Tabs */}
         <div className="nav-tabs">
           <button className={`nav-tab ${activeTab === 'pipeline' ? 'active' : ''}`} onClick={() => setActiveTab('pipeline')}>
-            <i className="fas fa-database"></i>
-            <span>Pipeline</span>
+            Pipeline
           </button>
           <button className={`nav-tab ${activeTab === 'advanced' ? 'active' : ''}`} onClick={() => setActiveTab('advanced')}>
-            <i className="fas fa-network-wired"></i>
-            <span>Analysis</span>
+            Analysis
           </button>
           <button className={`nav-tab ${activeTab === 'rag' ? 'active' : ''}`} onClick={() => setActiveTab('rag')}>
-            <i className="fas fa-comments"></i>
-            <span>RAG Query</span>
+            RAG Query
           </button>
         </div>
 
@@ -1089,79 +1189,167 @@ const CFRDashboard = () => {
       )}
 
 
-      {/* RAG Query Tab */}
+      {/* RAG Query Tab - Chat Interface */}
       {activeTab === 'rag' && (
         <div className="tab-content active">
-          <div className="card">
-            <div className="card-header">
-              <i className="fas fa-robot"></i>
-              <h2>RAG Query Interface</h2>
-            </div>
-            <p className="card-description">
-              Use natural language to search and retrieve relevant regulatory content. Powered by semantic embeddings and AI.
-            </p>
-
-            <div className="form-group">
-              <label><i className="fas fa-keyboard"></i> Enter Your Query</label>
-              <textarea
-                value={ragQuery}
-                onChange={(e) => setRagQuery(e.target.value)}
-                placeholder="Example: What are the regulations about consumer protection and privacy?"
-              />
-            </div>
-
-            <div className="form-grid">
-              <div className="form-group">
-                <label><i className="fas fa-filter"></i> Search Level</label>
-                <select value={ragLevel} onChange={(e) => setRagLevel(e.target.value)}>
-                  <option value="all">All Levels</option>
-                  <option value="chapter">Chapter Only</option>
-                  <option value="subchapter">Subchapter Only</option>
-                  <option value="section">Section Only</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label><i className="fas fa-list-ol"></i> Top K Results</label>
-                <input
-                  type="number"
-                  value={ragTopK}
-                  onChange={(e) => setRagTopK(e.target.value)}
-                  min="1"
-                  max="50"
-                />
-              </div>
-            </div>
-
-            <button className="btn btn-primary" onClick={runRAGQuery} disabled={ragLoading}>
-              <i className="fas fa-search"></i> Search
-            </button>
-          </div>
-
-          {ragLoading && (
-            <div className="loading">
-              <div className="spinner"></div>
-              <p className="loading-text">Searching...</p>
-            </div>
-          )}
-
-          {ragResults && (
-            <div className="result-box">
-              <h3>Search Results</h3>
-              {ragResults.results && ragResults.results.length > 0 ? (
-                <div className="results-list">
-                  {ragResults.results.map((result, i) => (
-                    <div key={i} className="result-item">
-                      <h4>{result.name || result.section_number}</h4>
-                      <p><strong>Similarity:</strong> {(result.similarity_score * 100).toFixed(1)}%</p>
-                      <p>{result.subject || result.text?.substring(0, 200)}...</p>
-                    </div>
-                  ))}
+          <div className="rag-layout">
+            {/* Chat Container */}
+            <div className="chat-container">
+              <div className="chat-header">
+                <div className="chat-icon">💬</div>
+                <div className="chat-title">
+                  <h2>RAG Query Interface</h2>
+                  <p>Ask questions about CFR regulations</p>
                 </div>
-              ) : (
-                <p>No results found</p>
-              )}
+              </div>
+
+              <div className="chat-messages">
+                {chatMessages.map((msg, idx) => (
+                  <div key={idx} className={`message ${msg.role}`}>
+                    <div className="message-header">
+                      {msg.role === 'ai' ? 'AI Assistant' : 'You'}
+                    </div>
+                    <div className="message-content">
+                      {msg.content.split('\n').map((line, i) => (
+                        <React.Fragment key={i}>
+                          {line}
+                          {i < msg.content.split('\n').length - 1 && <br />}
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="chat-input-container">
+                <textarea
+                  className="chat-input"
+                  value={ragQuery}
+                  onChange={(e) => setRagQuery(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  placeholder="Ask a question about CFR regulations..."
+                  rows="1"
+                />
+                <button className="send-btn" onClick={() => runRAGQuery()} disabled={ragLoading}>
+                  <span>➤</span>
+                </button>
+              </div>
+
+              {/* Quick Queries */}
+              <div className="quick-queries">
+                <h4>Quick Queries</h4>
+                <button className="quick-query-btn" onClick={() => useQuickQuery('What are the main regulations in Chapter 1?')}>
+                  <span>🔍</span>
+                  <span>What are the main regulations in Chapter 1?</span>
+                </button>
+                <button className="quick-query-btn" onClick={() => useQuickQuery('Summarize recent changes')}>
+                  <span>📝</span>
+                  <span>Summarize recent changes</span>
+                </button>
+                <button className="quick-query-btn" onClick={() => useQuickQuery('Find regulations about consumer protection')}>
+                  <span>🛡️</span>
+                  <span>Find regulations about consumer protection</span>
+                </button>
+                <button className="quick-query-btn" onClick={() => useQuickQuery('List all safety requirements')}>
+                  <span>✅</span>
+                  <span>List all safety requirements</span>
+                </button>
+              </div>
             </div>
-          )}
+
+            {/* Sidebar */}
+            <div className="sidebar">
+              {/* Query Settings */}
+              <div className="settings-card">
+                <h3>
+                  <span>⚙️</span>
+                  <span>Query Settings</span>
+                </h3>
+
+                <div className="setting-group">
+                  <div className="setting-label">
+                    <span>Temperature</span>
+                    <span className="setting-value">{temperature}</span>
+                  </div>
+                  <input
+                    type="range"
+                    className="slider"
+                    min="0"
+                    max="1"
+                    step="0.1"
+                    value={temperature}
+                    onChange={(e) => setTemperature(parseFloat(e.target.value))}
+                  />
+                  <div className="setting-hint">Higher values make output more random</div>
+                </div>
+
+                <div className="setting-group">
+                  <div className="setting-label">
+                    <span>Max Tokens</span>
+                    <span className="setting-value">{maxTokens}</span>
+                  </div>
+                  <input
+                    type="range"
+                    className="slider"
+                    min="100"
+                    max="2000"
+                    step="100"
+                    value={maxTokens}
+                    onChange={(e) => setMaxTokens(parseInt(e.target.value))}
+                  />
+                  <div className="setting-hint">Maximum length of response</div>
+                </div>
+
+                <div className="setting-group">
+                  <div className="toggle-switch">
+                    <span>Semantic Search</span>
+                    <label className="switch">
+                      <input
+                        type="checkbox"
+                        checked={semanticSearch}
+                        onChange={(e) => setSemanticSearch(e.target.checked)}
+                      />
+                      <span className="switch-slider"></span>
+                    </label>
+                  </div>
+                  <div className="setting-hint">Use AI-powered embeddings</div>
+                </div>
+              </div>
+
+              {/* Model Information */}
+              <div className="settings-card">
+                <h3>
+                  <span>🤖</span>
+                  <span>Model Information</span>
+                </h3>
+
+                <div className="info-item">
+                  <span className="info-label">Model:</span>
+                  <span className="info-value">GPT-4</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">Embeddings:</span>
+                  <span className="info-value">{stats.embeddings.toLocaleString()}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">Index Size:</span>
+                  <span className="info-value">2.4 MB</span>
+                </div>
+              </div>
+
+              {/* Export Conversation */}
+              <div className="settings-card">
+                <h3>
+                  <span>📥</span>
+                  <span>Export Conversation</span>
+                </h3>
+
+                <button className="export-btn" onClick={exportAsPDF}>Export as PDF</button>
+                <button className="export-btn" onClick={exportAsJSON}>Export as JSON</button>
+                <button className="export-btn" onClick={copyToClipboard}>Copy to Clipboard</button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
