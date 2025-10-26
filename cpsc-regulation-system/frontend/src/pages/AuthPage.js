@@ -73,12 +73,26 @@ const GradientContainer = styled(Box)(({ theme }) => ({
 
 const LeftPanel = styled(Box)(({ theme }) => ({
   flex: 1,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '40px 60px',
+  background: 'white',
+  '@media (max-width: 960px)': {
+    flex: 'unset',
+    width: '100%',
+    padding: '40px 20px'
+  }
+}));
+
+const RightPanel = styled(Box)(({ theme }) => ({
+  flex: 1,
   background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',
-  padding: '60px',
+  padding: '80px 60px',
   color: 'white',
   position: 'relative',
   overflow: 'hidden',
@@ -93,19 +107,6 @@ const LeftPanel = styled(Box)(({ theme }) => ({
   },
   '@media (max-width: 960px)': {
     display: 'none'
-  }
-}));
-
-const RightPanel = styled(Box)(({ theme }) => ({
-  flex: 1,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  padding: '40px',
-  background: 'white',
-  '@media (max-width: 960px)': {
-    flex: 'unset',
-    width: '100%'
   }
 }));
 
@@ -338,91 +339,6 @@ const AuthPage = () => {
   return (
     <GradientContainer>
       <LeftPanel>
-        <Box sx={{ maxWidth: '500px', position: 'relative', zIndex: 1 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
-            <BoltIcon sx={{ fontSize: '32px' }} />
-            <Typography variant="h6" sx={{ fontWeight: 'bold', letterSpacing: '1px' }}>
-              AI-Powered Regulatory Intelligence
-            </Typography>
-          </Box>
-          
-          <Typography variant="h3" sx={{ fontWeight: 'bold', mb: 3, lineHeight: 1.2 }}>
-            Transform how you navigate federal regulations
-          </Typography>
-          
-          <Typography variant="h6" sx={{ mb: 5, opacity: 0.9, fontWeight: 400 }}>
-            Harness the power of AI to search, analyze, and understand the Code of Federal Regulations instantly.
-          </Typography>
-
-          <FeatureCard>
-            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
-              <BookIcon sx={{ fontSize: '32px', mt: 0.5 }} />
-              <Box>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
-                  1,176+ Regulations
-                </Typography>
-                <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                  Access comprehensive CFR database with AI-powered search
-                </Typography>
-              </Box>
-            </Box>
-          </FeatureCard>
-
-          <FeatureCard>
-            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
-              <BoltIcon sx={{ fontSize: '32px', mt: 0.5 }} />
-              <Box>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
-                  Instant Analysis
-                </Typography>
-                <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                  Process regulatory documents in seconds, not hours
-                </Typography>
-              </Box>
-            </Box>
-          </FeatureCard>
-
-          <FeatureCard>
-            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
-              <ShieldIcon sx={{ fontSize: '32px', mt: 0.5 }} />
-              <Box>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
-                  Compliance Ready
-                </Typography>
-                <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                  Stay updated with real-time regulatory changes
-                </Typography>
-              </Box>
-            </Box>
-          </FeatureCard>
-
-          <Box sx={{ display: 'flex', gap: 8, mt: 5 }}>
-            <Box>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 0.5 }}>99.9%</Typography>
-              <Typography variant="body2" sx={{ opacity: 0.9 }}>Accuracy Rate</Typography>
-            </Box>
-            <Box>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 0.5 }}>10K+</Typography>
-              <Typography variant="body2" sx={{ opacity: 0.9 }}>Users</Typography>
-            </Box>
-            <Box>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 0.5 }}>24/7</Typography>
-              <Typography variant="body2" sx={{ opacity: 0.9 }}>Support</Typography>
-            </Box>
-          </Box>
-
-          <Box sx={{ mt: 5, pt: 4, borderTop: '1px solid rgba(255,255,255,0.2)' }}>
-            <Typography variant="caption" sx={{ opacity: 0.7, display: 'block', mb: 1 }}>
-              Trusted by compliance teams at
-            </Typography>
-            <Typography variant="body2" sx={{ opacity: 0.8 }}>
-              Fortune 500 • Legal Firms • Gov Agencies
-            </Typography>
-          </Box>
-        </Box>
-      </LeftPanel>
-
-      <RightPanel>
         <Container maxWidth="sm">
           <StyledPaper elevation={0}>
             <LogoBox>
@@ -619,7 +535,7 @@ const AuthPage = () => {
                 {loading ? (
                   <CircularProgress size={24} sx={{ color: 'white' }} />
                 ) : (
-                  isSignup ? 'Sign in to Dashboard →' : 'Sign up'
+                  isSignup ? 'Create Account' : 'Sign in to Dashboard →'
                 )}
               </PrimaryButton>
 
@@ -663,6 +579,91 @@ const AuthPage = () => {
             </Box>
           </StyledPaper>
         </Container>
+      </LeftPanel>
+
+      <RightPanel>
+        <Box sx={{ maxWidth: '550px', position: 'relative', zIndex: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
+            <BoltIcon sx={{ fontSize: '32px' }} />
+            <Typography variant="h6" sx={{ fontWeight: 'bold', letterSpacing: '1px' }}>
+              AI-Powered Regulatory Intelligence
+            </Typography>
+          </Box>
+          
+          <Typography variant="h3" sx={{ fontWeight: 'bold', mb: 3, lineHeight: 1.2 }}>
+            Transform how you navigate federal regulations
+          </Typography>
+          
+          <Typography variant="h6" sx={{ mb: 5, opacity: 0.9, fontWeight: 400 }}>
+            Harness the power of AI to search, analyze, and understand the Code of Federal Regulations instantly.
+          </Typography>
+
+          <FeatureCard>
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+              <BookIcon sx={{ fontSize: '32px', mt: 0.5 }} />
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
+                  1,176+ Regulations
+                </Typography>
+                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                  Access comprehensive CFR database with AI-powered search
+                </Typography>
+              </Box>
+            </Box>
+          </FeatureCard>
+
+          <FeatureCard>
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+              <BoltIcon sx={{ fontSize: '32px', mt: 0.5 }} />
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
+                  Instant Analysis
+                </Typography>
+                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                  Process regulatory documents in seconds, not hours
+                </Typography>
+              </Box>
+            </Box>
+          </FeatureCard>
+
+          <FeatureCard>
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+              <ShieldIcon sx={{ fontSize: '32px', mt: 0.5 }} />
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
+                  Compliance Ready
+                </Typography>
+                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                  Stay updated with real-time regulatory changes
+                </Typography>
+              </Box>
+            </Box>
+          </FeatureCard>
+
+          <Box sx={{ display: 'flex', gap: 8, mt: 5 }}>
+            <Box>
+              <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 0.5 }}>99.9%</Typography>
+              <Typography variant="body2" sx={{ opacity: 0.9 }}>Accuracy Rate</Typography>
+            </Box>
+            <Box>
+              <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 0.5 }}>10K+</Typography>
+              <Typography variant="body2" sx={{ opacity: 0.9 }}>Users</Typography>
+            </Box>
+            <Box>
+              <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 0.5 }}>24/7</Typography>
+              <Typography variant="body2" sx={{ opacity: 0.9 }}>Support</Typography>
+            </Box>
+          </Box>
+
+          <Box sx={{ mt: 5, pt: 4, borderTop: '1px solid rgba(255,255,255,0.2)' }}>
+            <Typography variant="caption" sx={{ opacity: 0.7, display: 'block', mb: 1 }}>
+              Trusted by compliance teams at
+            </Typography>
+            <Typography variant="body2" sx={{ opacity: 0.8 }}>
+              Fortune 500 • Legal Firms • Gov Agencies
+            </Typography>
+          </Box>
+        </Box>
       </RightPanel>
     </GradientContainer>
   );
