@@ -130,19 +130,11 @@ class DataPipeline:
                 print(f"  {key}: {value}")
                 
         except Exception as e:
-<<<<<<< HEAD
-            self.update_status(state='error', error_message=str(e))
-            print(f"\n[ERROR] Pipeline failed: {e}")
-            print(f"[ERROR] Error type: {type(e).__name__}")
-            import traceback
-            print("[ERROR] Full traceback:")
-=======
             import traceback
             error_details = f"{type(e).__name__}: {str(e)}"
             self.update_status(state='error', error_message=error_details)
             print(f"\n[ERROR] Pipeline failed: {error_details}")
             print(f"[ERROR] Full traceback:")
->>>>>>> 08011d6a4a470f66b512100aad90b4bde1f05b9b
             traceback.print_exc()
             raise
     
@@ -280,19 +272,14 @@ class DataPipeline:
             # Generate chapter embeddings
             print("  Generating chapter embeddings...")
             chapters = db.query(Chapter).all()
-<<<<<<< HEAD
-            print(f"    Processing {len(chapters)} chapters...")
-            for idx, chapter in enumerate(chapters, 1):
-                print(f"      Chapter {idx}/{len(chapters)}")
-=======
             print(f"    Found {len(chapters)} chapters")
             
             if len(chapters) == 0:
                 print("    [WARNING] No chapters found in database!")
                 return
             
-            for chapter in tqdm(chapters, desc="    Chapters"):
->>>>>>> 08011d6a4a470f66b512100aad90b4bde1f05b9b
+            for idx, chapter in enumerate(chapters, 1):
+                print(f"      Chapter {idx}/{len(chapters)}")
                 # Create text representation
                 text = chapter.name
                 
@@ -311,16 +298,11 @@ class DataPipeline:
             # Generate subchapter embeddings
             print("  Generating subchapter embeddings...")
             subchapters = db.query(Subchapter).all()
-<<<<<<< HEAD
-            print(f"    Processing {len(subchapters)} subchapters...")
+            print(f"    Found {len(subchapters)} subchapters")
+            
             for idx, subchapter in enumerate(subchapters, 1):
                 if idx % 5 == 0 or idx == len(subchapters):
                     print(f"      Subchapter {idx}/{len(subchapters)}")
-=======
-            print(f"    Found {len(subchapters)} subchapters")
-            
-            for subchapter in tqdm(subchapters, desc="    Subchapters"):
->>>>>>> 08011d6a4a470f66b512100aad90b4bde1f05b9b
                 # Create text representation
                 text = f"{subchapter.chapter.name} - {subchapter.name}"
                 
@@ -339,13 +321,9 @@ class DataPipeline:
             # Generate section embeddings
             print("  Generating section embeddings...")
             sections = db.query(Section).all()
-<<<<<<< HEAD
-            print(f"    Processing {len(sections)} sections in batches of 32...")
-
-=======
             print(f"    Found {len(sections)} sections")
+            print(f"    Processing sections in batches of 32...")
             
->>>>>>> 08011d6a4a470f66b512100aad90b4bde1f05b9b
             # Batch process sections for efficiency
             batch_size = 32
             total_batches = (len(sections) + batch_size - 1) // batch_size
