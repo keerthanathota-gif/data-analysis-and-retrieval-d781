@@ -24,18 +24,21 @@ CRAWL_URLS = DEFAULT_CRAWL_URLS.copy()
 
 # Database configuration helper for cross-platform compatibility
 def get_sqlite_url(db_name):
-    """Generate proper SQLite URL that works on all platforms"""
+    """Generate proper SQLite URL that works on all platforms
+    
+    SQLite URL format:
+    - Unix absolute: sqlite:////absolute/path (4 slashes)
+    - Windows: sqlite:///C:/path (3 slashes, drive letter after)
+    - Relative: sqlite:///relative/path (3 slashes)
+    """
     db_path = Path(BASE_DIR) / db_name
     db_path_str = str(db_path.absolute())
     # Convert backslashes to forward slashes for SQLite
     db_path_str = db_path_str.replace('\\', '/')
-    # Remove any drive letter colon issues on Windows (C: becomes C)
-    # SQLite expects forward slashes even on Windows
-    if len(db_path_str) > 1 and db_path_str[1] == ':':
-        # Windows absolute path - ensure proper format
-        return f"sqlite:///{db_path_str}"
-    else:
-        return f"sqlite:///{db_path_str}"
+    
+    # For absolute Unix paths starting with /, we need 4 slashes total
+    # For Windows paths with drive letters, we need 3 slashes
+    return f"sqlite:///{db_path_str}"
 
 # Database configuration - Dual databases for clean separation
 AUTH_DATABASE_URL = get_sqlite_url('auth.db')
