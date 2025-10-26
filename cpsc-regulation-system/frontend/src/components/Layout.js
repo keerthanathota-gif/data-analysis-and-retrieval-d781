@@ -72,8 +72,8 @@ const Layout = ({ children }) => {
         sx={{
           width: '100%',
           px: 0,
-          // Remove vertical padding on auth pages to eliminate outside margins
-          py: isAuthPage ? 0 : 3,
+          // Remove vertical padding on auth pages and dashboard to eliminate outside margins
+          py: isAuthPage || isDashboardPage ? 0 : 3,
         }}
       >
         {children}
