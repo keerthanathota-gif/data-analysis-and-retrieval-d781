@@ -410,6 +410,7 @@ const CFRDashboard = () => {
   const handleSignOut = () => {
     if (window.confirm('Are you sure you want to sign out?')) {
       localStorage.removeItem('token');
+      localStorage.removeItem('user');
       window.location.href = '/login';
     }
   };

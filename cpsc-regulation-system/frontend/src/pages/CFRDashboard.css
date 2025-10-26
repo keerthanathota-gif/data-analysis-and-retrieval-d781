@@ -20,15 +20,19 @@
 }
 
 body {
-  background: var(--light);
+  background: #f5f3ff;
   min-height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
 
 .app-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  background: white;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f5f3ff;
+  overflow: hidden;
 }
 
 @keyframes slideUp {
@@ -44,12 +48,12 @@ body {
 
 /* Header */
 .dashboard-header {
-  background: white;
-  padding: 16px 32px;
+  background: #f5f3ff;
+  padding: 20px 40px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid var(--border);
+  border-bottom: none;
 }
 
 .dashboard-logo {
@@ -72,8 +76,8 @@ body {
 }
 
 .sign-out-btn {
-  background: transparent;
-  border: 1px solid var(--border);
+  background: white;
+  border: 1px solid #e5e7eb;
   padding: 8px 16px;
   border-radius: 8px;
   display: flex;
@@ -81,48 +85,56 @@ body {
   gap: 8px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 500;
   color: var(--text);
   transition: all 0.2s;
 }
 
 .sign-out-btn:hover {
-  background: var(--input-bg);
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.sign-out-btn span:first-child {
+  font-size: 16px;
+  transform: rotate(45deg);
 }
 
 /* Dashboard Layout */
 .dashboard-layout {
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - 64px);
+  flex: 1;
+  overflow: hidden;
+  height: calc(100vh - 65px);
 }
 
 /* Navigation */
 .nav-tabs {
   display: flex;
-  background: white;
-  padding: 0 32px;
-  gap: 8px;
-  border-bottom: 1px solid var(--border);
+  justify-content: center;
+  background: #f5f3ff;
+  padding: 16px 32px;
+  gap: 16px;
+  border-bottom: none;
 }
 
 .dashboard-content {
   flex: 1;
-  padding: 32px;
+  padding: 24px 32px;
   overflow-y: auto;
-  max-width: 1400px;
-  margin: 0 auto;
-  width: 100%;
+  overflow-x: hidden;
 }
 
 .nav-tab {
-  padding: 16px 24px;
-  background: transparent;
+  padding: 12px 32px;
+  background: white;
   border: none;
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  color: var(--text-light);
-  border-bottom: 2px solid transparent;
+  color: #6b7280;
+  border-radius: 8px;
   transition: all 0.2s;
   display: flex;
   align-items: center;
@@ -131,18 +143,21 @@ body {
 
 .nav-tab:hover {
   color: var(--text);
-  background: var(--input-bg);
+  background: #f3f4f6;
 }
 
 .nav-tab.active {
-  color: var(--primary);
-  border-bottom-color: var(--primary);
-  background: var(--light);
+  color: var(--text);
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* Content */
 .tab-content {
   animation: fadeIn 0.5s;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 @keyframes fadeIn {
@@ -159,17 +174,16 @@ body {
 /* Cards */
 .card {
   background: white;
-  border-radius: 16px;
-  padding: 30px;
-  margin-bottom: 25px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.07);
-  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border: 1px solid #e5e7eb;
   transition: all 0.3s;
 }
 
 .card:hover {
-  box-shadow: 0 12px 24px rgba(0,0,0,0.12);
-  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 .card-header {
@@ -464,6 +478,8 @@ textarea {
   display: grid;
   grid-template-columns: 1fr 360px;
   gap: 24px;
+  height: 100%;
+  overflow: hidden;
 }
 
 .chat-container {
@@ -474,6 +490,8 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  height: 100%;
+  overflow: hidden;
 }
 
 .chat-header {
@@ -508,12 +526,12 @@ textarea {
 }
 
 .chat-messages {
-  min-height: 400px;
-  max-height: 500px;
+  flex: 1;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  max-height: calc(100vh - 500px);
 }
 
 .message {
@@ -589,6 +607,8 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  overflow-y: auto;
+  height: 100%;
 }
 
 .settings-card {

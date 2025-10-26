@@ -18,6 +18,7 @@ const Layout = ({ children }) => {
   };
 
   const isAuthPage = ['/login', '/signup', '/admin-login'].includes(location.pathname);
+  const isDashboardPage = location.pathname === '/dashboard';
 
   return (
     <Box
@@ -27,7 +28,7 @@ const Layout = ({ children }) => {
         bgcolor: 'transparent',
       }}
     >
-      {isAuthenticated && (
+      {isAuthenticated && !isDashboardPage && (
         <AppBar
           position="sticky"
           elevation={0}
@@ -71,8 +72,8 @@ const Layout = ({ children }) => {
         sx={{
           width: '100%',
           px: 0,
-          // Remove vertical padding on auth pages to eliminate outside margins
-          py: isAuthPage ? 0 : 3,
+          // Remove vertical padding on auth pages and dashboard to eliminate outside margins
+          py: isAuthPage || isDashboardPage ? 0 : 3,
         }}
       >
         {children}
