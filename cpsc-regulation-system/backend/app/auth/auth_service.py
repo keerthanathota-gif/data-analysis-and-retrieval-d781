@@ -416,3 +416,6 @@ class AuthService:
             "admin_users": admin_users,
             "regular_users": total_users - admin_users
         }
+
+# Create a singleton instance for easy import
+auth_service = AuthService()
