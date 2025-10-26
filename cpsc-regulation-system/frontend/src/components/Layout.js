@@ -18,6 +18,7 @@ const Layout = ({ children }) => {
   };
 
   const isAuthPage = ['/login', '/signup', '/admin-login'].includes(location.pathname);
+  const isDashboardPage = location.pathname === '/dashboard';
 
   return (
     <Box
@@ -27,7 +28,7 @@ const Layout = ({ children }) => {
         bgcolor: 'transparent',
       }}
     >
-      {isAuthenticated && (
+      {isAuthenticated && !isDashboardPage && (
         <AppBar
           position="sticky"
           elevation={0}
