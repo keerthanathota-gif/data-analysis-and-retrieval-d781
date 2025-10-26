@@ -137,14 +137,30 @@ class ParityCheck(Base):
     llm_justification = Column(Text)  # LLM explanation
     created_at = Column(DateTime, default=datetime.utcnow)
 
-# Database initialization
-engine = create_engine(CFR_DATABASE_URL, echo=False)
+# Database initialization with proper connection handling
+import os
+connect_args = {"check_same_thread": False}
+if os.name == 'nt':  # Additional Windows-specific settings
+    connect_args['timeout'] = 30
+
+engine = create_engine(
+    CFR_DATABASE_URL, 
+    echo=False,
+    connect_args=connect_args,
+    pool_pre_ping=True,
+    pool_size=10,
+    max_overflow=20
+)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 def init_cfr_db():
     """Initialize CFR database and create all tables"""
-    Base.metadata.create_all(bind=engine)
-    print("CFR database initialized")
+    try:
+        Base.metadata.create_all(bind=engine)
+        print(f"✓ CFR database initialized successfully")
+    except Exception as e:
+        print(f"✗ Error initializing CFR database: {e}")
+        raise
 
 def reset_cfr_db():
     """Reset CFR database - drop all tables and recreate"""

@@ -2,13 +2,17 @@
 Configuration file for CFR Agentic AI Application
 """
 import os
-from dotenv import load_dotenv
+from pathlib import Path
 
-# Load environment variables from .env file
-load_dotenv()
+# Try to load dotenv if available (optional)
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass  # dotenv not installed, continue without it
 
-# Base directory (project root)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Base directory (project root) - using Path for better cross-platform support
+BASE_DIR = str(Path(__file__).parent.parent.absolute())
 
 # Default URLs to crawl for CFR data (can be overridden by user input)
 DEFAULT_CRAWL_URLS = [
@@ -18,9 +22,18 @@ DEFAULT_CRAWL_URLS = [
 # URLs will be set dynamically by user input
 CRAWL_URLS = DEFAULT_CRAWL_URLS.copy()
 
+# Database configuration helper for cross-platform compatibility
+def get_sqlite_url(db_name):
+    """Generate proper SQLite URL that works on all platforms"""
+    db_path = Path(BASE_DIR) / db_name
+    db_path_str = str(db_path.absolute())
+    # Convert backslashes to forward slashes for SQLite
+    db_path_str = db_path_str.replace('\\', '/')
+    return f"sqlite:///{db_path_str}"
+
 # Database configuration - Dual databases for clean separation
-AUTH_DATABASE_URL = f"sqlite:///{os.path.join(BASE_DIR, 'auth.db')}"
-CFR_DATABASE_URL = f"sqlite:///{os.path.join(BASE_DIR, 'cfr_data.db')}"
+AUTH_DATABASE_URL = get_sqlite_url('auth.db')
+CFR_DATABASE_URL = get_sqlite_url('cfr_data.db')
 
 # Legacy support - some old imports might still use DATABASE_URL
 DATABASE_URL = CFR_DATABASE_URL  # Deprecated - use CFR_DATABASE_URL or AUTH_DATABASE_URL
