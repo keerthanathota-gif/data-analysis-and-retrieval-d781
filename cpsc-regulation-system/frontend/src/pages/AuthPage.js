@@ -251,6 +251,7 @@ const AuthPage = () => {
     role: 'user'
   });
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -268,6 +269,7 @@ const AuthPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     setLoading(true);
 
     try {
@@ -283,7 +285,17 @@ const AuthPage = () => {
           password: formData.password,
           role: formData.role
         });
-        setIsSignup(false);
+        
+        // Show success message
+        setSuccess(`Account created successfully! You can now login with username: ${formData.username}`);
+        
+        // Switch to login mode after 2 seconds
+        setTimeout(() => {
+          setIsSignup(false);
+          setSuccess('');
+        }, 3000);
+        
+        // Clear form but keep username for easy login
         setFormData({
           username: formData.username,
           email: '',
@@ -292,8 +304,6 @@ const AuthPage = () => {
           rememberMe: false,
           role: 'user'
         });
-        setError('');
-        // Show success message or automatically log in
       } else {
         await login(formData.username, formData.password);
         navigate('/dashboard');
@@ -339,6 +349,7 @@ const AuthPage = () => {
   const toggleMode = () => {
     setIsSignup(!isSignup);
     setError('');
+    setSuccess('');
     setFormData({
       username: formData.username,
       email: '',
@@ -388,6 +399,23 @@ const AuthPage = () => {
                   onClose={() => setError('')}
                 >
                   {error}
+                </Alert>
+              </Fade>
+            )}
+
+            {success && (
+              <Fade in={true}>
+                <Alert 
+                  severity="success" 
+                  sx={{ 
+                    mb: 3, 
+                    borderRadius: '8px',
+                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                    border: '1px solid rgba(34, 197, 94, 0.3)'
+                  }} 
+                  onClose={() => setSuccess('')}
+                >
+                  {success}
                 </Alert>
               </Fade>
             )}
