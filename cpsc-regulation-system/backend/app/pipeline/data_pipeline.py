@@ -8,7 +8,6 @@ import glob
 import json
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any
-from tqdm import tqdm
 
 from app.pipeline.crawler import download_and_extract_zip
 from app.pipeline.cfr_parser import parse_chapter_subchapter_part_sections, save_json, save_csv
@@ -133,6 +132,10 @@ class DataPipeline:
         except Exception as e:
             self.update_status(state='error', error_message=str(e))
             print(f"\n[ERROR] Pipeline failed: {e}")
+            print(f"[ERROR] Error type: {type(e).__name__}")
+            import traceback
+            print("[ERROR] Full traceback:")
+            traceback.print_exc()
             raise
     
     def crawl_data(self):
@@ -184,10 +187,13 @@ class DataPipeline:
     def store_in_database(self, parsed_data_list: List[Dict[str, Any]]):
         """Store parsed data in SQLite database"""
         db = SessionLocal()
-        
+
         try:
             for parsed_data in parsed_data_list:
-                for chapter_data in tqdm(parsed_data.get("chapters", []), desc="  Processing chapters"):
+                chapters = parsed_data.get("chapters", [])
+                print(f"  Processing {len(chapters)} chapters...")
+                for idx, chapter_data in enumerate(chapters, 1):
+                    print(f"    Chapter {idx}/{len(chapters)}: {chapter_data.get('chapter_name', 'Unknown')}")
                     # Create chapter
                     chapter = Chapter(name=chapter_data["chapter_name"])
                     db.add(chapter)
@@ -228,6 +234,10 @@ class DataPipeline:
         except Exception as e:
             db.rollback()
             print(f"  [ERROR] Error storing data: {e}")
+            print(f"  [ERROR] Error type: {type(e).__name__}")
+            import traceback
+            print(f"  [ERROR] Traceback:")
+            traceback.print_exc()
             raise
         finally:
             db.close()
@@ -240,7 +250,9 @@ class DataPipeline:
             # Generate chapter embeddings
             print("  Generating chapter embeddings...")
             chapters = db.query(Chapter).all()
-            for chapter in tqdm(chapters, desc="    Chapters"):
+            print(f"    Processing {len(chapters)} chapters...")
+            for idx, chapter in enumerate(chapters, 1):
+                print(f"      Chapter {idx}/{len(chapters)}")
                 # Create text representation
                 text = chapter.name
                 
@@ -259,7 +271,10 @@ class DataPipeline:
             # Generate subchapter embeddings
             print("  Generating subchapter embeddings...")
             subchapters = db.query(Subchapter).all()
-            for subchapter in tqdm(subchapters, desc="    Subchapters"):
+            print(f"    Processing {len(subchapters)} subchapters...")
+            for idx, subchapter in enumerate(subchapters, 1):
+                if idx % 5 == 0 or idx == len(subchapters):
+                    print(f"      Subchapter {idx}/{len(subchapters)}")
                 # Create text representation
                 text = f"{subchapter.chapter.name} - {subchapter.name}"
                 
@@ -278,10 +293,13 @@ class DataPipeline:
             # Generate section embeddings
             print("  Generating section embeddings...")
             sections = db.query(Section).all()
-            
+            print(f"    Processing {len(sections)} sections in batches of 32...")
+
             # Batch process sections for efficiency
             batch_size = 32
-            for i in tqdm(range(0, len(sections), batch_size), desc="    Sections"):
+            total_batches = (len(sections) + batch_size - 1) // batch_size
+            for batch_num, i in enumerate(range(0, len(sections), batch_size), 1):
+                print(f"      Batch {batch_num}/{total_batches}")
                 batch = sections[i:i+batch_size]
                 
                 # Prepare texts
