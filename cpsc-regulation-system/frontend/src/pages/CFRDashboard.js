@@ -449,192 +449,183 @@ const CFRDashboard = () => {
       {/* Pipeline Tab */}
       {activeTab === 'pipeline' && (
         <div className="tab-content active">
-          {/* Statistics Card */}
-          <div className="card">
-            <div className="card-header">
-              <i className="fas fa-chart-bar"></i>
-              <h2>Database Statistics</h2>
-            </div>
+          {/* Database Statistics - Exact Match from data-analysis system */}
+          <h2 style={{
+            fontSize: '18px',
+            fontWeight: '600',
+            marginBottom: '20px',
+            color: 'var(--text)'
+          }}>Database Statistics</h2>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '20px',
+            marginBottom: '32px'
+          }}>
+            {/* Total Chapters - Teal */}
             <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-              gap: '20px'
+              background: 'linear-gradient(135deg, #e0f7f7 0%, #f0fffe 100%)',
+              padding: '24px',
+              borderRadius: '16px',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px',
+              transition: 'transform 0.2s, box-shadow 0.2s',
+              border: '1px solid rgba(20, 184, 166, 0.1)',
+              cursor: 'pointer'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.12)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.08)';
             }}>
-              {/* Total Chapters */}
               <div style={{
-                padding: '24px',
-                background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
+                width: '48px',
+                height: '48px',
                 borderRadius: '12px',
-                border: '2px solid #10b981',
-                position: 'relative',
-                overflow: 'hidden'
+                background: '#14b8a6',
+                color: 'white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '24px'
               }}>
-                <div style={{
-                  position: 'absolute',
-                  top: '-20px',
-                  right: '-20px',
-                  width: '80px',
-                  height: '80px',
-                  background: 'rgba(16, 185, 129, 0.1)',
-                  borderRadius: '50%'
-                }}></div>
-                <div style={{ position: 'relative', zIndex: 1 }}>
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    marginBottom: '12px'
-                  }}>
-                    <div style={{
-                      width: '48px',
-                      height: '48px',
-                      background: '#10b981',
-                      borderRadius: '10px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'white',
-                      fontSize: '1.4em'
-                    }}>
-                      <i className="fas fa-book"></i>
-                    </div>
-                    <div>
-                      <div style={{
-                        fontSize: '2.5em',
-                        fontWeight: 'bold',
-                        color: '#047857',
-                        lineHeight: '1'
-                      }}>
-                        {stats.chapters}
-                      </div>
-                    </div>
-                  </div>
-                  <div style={{
-                    fontSize: '0.95rem',
-                    color: '#065f46',
-                    fontWeight: '600'
-                  }}>
-                    Total Chapters
-                  </div>
-                </div>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg>
               </div>
-
-              {/* Total Regulations */}
-              <div style={{
-                padding: '24px',
-                background: 'linear-gradient(135deg, #ecfccb 0%, #d9f99d 100%)',
-                borderRadius: '12px',
-                border: '2px solid #84cc16',
-                position: 'relative',
-                overflow: 'hidden'
-              }}>
+              <div>
                 <div style={{
-                  position: 'absolute',
-                  top: '-20px',
-                  right: '-20px',
-                  width: '80px',
-                  height: '80px',
-                  background: 'rgba(132, 204, 22, 0.1)',
-                  borderRadius: '50%'
-                }}></div>
-                <div style={{ position: 'relative', zIndex: 1 }}>
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    marginBottom: '12px'
-                  }}>
-                    <div style={{
-                      width: '48px',
-                      height: '48px',
-                      background: '#84cc16',
-                      borderRadius: '10px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'white',
-                      fontSize: '1.4em'
-                    }}>
-                      <i className="fas fa-file-alt"></i>
-                    </div>
-                    <div>
-                      <div style={{
-                        fontSize: '2.5em',
-                        fontWeight: 'bold',
-                        color: '#4d7c0f',
-                        lineHeight: '1'
-                      }}>
-                        {stats.sections}
-                      </div>
-                    </div>
-                  </div>
-                  <div style={{
-                    fontSize: '0.95rem',
-                    color: '#365314',
-                    fontWeight: '600'
-                  }}>
-                    Total Regulations
-                  </div>
-                </div>
+                  fontSize: '12px',
+                  color: 'var(--text-light)',
+                  fontWeight: '500',
+                  marginBottom: '4px',
+                  textTransform: 'capitalize'
+                }}>Total Chapters</div>
+                <div style={{
+                  fontSize: '32px',
+                  fontWeight: '700',
+                  color: 'var(--text)',
+                  letterSpacing: '-0.5px'
+                }}>{stats.chapters}</div>
               </div>
+            </div>
 
-              {/* Total Embeddings */}
+            {/* Total Regulations - Purple */}
+            <div style={{
+              background: 'linear-gradient(135deg, #f3e8ff 0%, #faf5ff 100%)',
+              padding: '24px',
+              borderRadius: '16px',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px',
+              transition: 'transform 0.2s, box-shadow 0.2s',
+              border: '1px solid rgba(139, 92, 246, 0.1)',
+              cursor: 'pointer'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.12)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.08)';
+            }}>
               <div style={{
-                padding: '24px',
-                background: 'linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%)',
+                width: '48px',
+                height: '48px',
                 borderRadius: '12px',
-                border: '2px solid #14b8a6',
-                position: 'relative',
-                overflow: 'hidden'
+                background: '#8b5cf6',
+                color: 'white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '24px'
               }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+              </div>
+              <div>
                 <div style={{
-                  position: 'absolute',
-                  top: '-20px',
-                  right: '-20px',
-                  width: '80px',
-                  height: '80px',
-                  background: 'rgba(20, 184, 166, 0.1)',
-                  borderRadius: '50%'
-                }}></div>
-                <div style={{ position: 'relative', zIndex: 1 }}>
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    marginBottom: '12px'
-                  }}>
-                    <div style={{
-                      width: '48px',
-                      height: '48px',
-                      background: '#14b8a6',
-                      borderRadius: '10px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'white',
-                      fontSize: '1.4em'
-                    }}>
-                      <i className="fas fa-brain"></i>
-                    </div>
-                    <div>
-                      <div style={{
-                        fontSize: '2.5em',
-                        fontWeight: 'bold',
-                        color: '#0f766e',
-                        lineHeight: '1'
-                      }}>
-                        {stats.embeddings}
-                      </div>
-                    </div>
-                  </div>
-                  <div style={{
-                    fontSize: '0.95rem',
-                    color: '#134e4a',
-                    fontWeight: '600'
-                  }}>
-                    Total Embeddings
-                  </div>
-                </div>
+                  fontSize: '12px',
+                  color: 'var(--text-light)',
+                  fontWeight: '500',
+                  marginBottom: '4px',
+                  textTransform: 'capitalize'
+                }}>Total Regulations</div>
+                <div style={{
+                  fontSize: '32px',
+                  fontWeight: '700',
+                  color: 'var(--text)',
+                  letterSpacing: '-0.5px'
+                }}>{stats.sections.toLocaleString()}</div>
+              </div>
+            </div>
+
+            {/* Total Embeddings - Blue */}
+            <div style={{
+              background: 'linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%)',
+              padding: '24px',
+              borderRadius: '16px',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px',
+              transition: 'transform 0.2s, box-shadow 0.2s',
+              border: '1px solid rgba(59, 130, 246, 0.1)',
+              cursor: 'pointer'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.12)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.08)';
+            }}>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: '12px',
+                background: '#3b82f6',
+                color: 'white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '24px'
+              }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="14" width="7" height="7"></rect>
+                  <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+              </div>
+              <div>
+                <div style={{
+                  fontSize: '12px',
+                  color: 'var(--text-light)',
+                  fontWeight: '500',
+                  marginBottom: '4px',
+                  textTransform: 'capitalize'
+                }}>Total Embeddings</div>
+                <div style={{
+                  fontSize: '32px',
+                  fontWeight: '700',
+                  color: 'var(--text)',
+                  letterSpacing: '-0.5px'
+                }}>{stats.embeddings.toLocaleString()}</div>
               </div>
             </div>
           </div>
