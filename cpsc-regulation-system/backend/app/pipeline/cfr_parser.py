@@ -72,18 +72,16 @@ def parse_chapter_subchapter_part_sections(xml_file):
 
 def save_json(data, output_file):
     """Save data to JSON file."""
-    from app.config import OUTPUT_DIR
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
-    output_path = os.path.join(OUTPUT_DIR, os.path.basename(output_file))
-    with open(output_path, 'w', encoding='utf-8') as f:
+    # Ensure the directory exists
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)
+    with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
 
 def save_csv(data, output_file):
     """Save data to CSV file."""
-    from app.config import OUTPUT_DIR
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
-    output_path = os.path.join(OUTPUT_DIR, os.path.basename(output_file))
-    with open(output_path, 'w', newline='', encoding='utf-8') as f:
+    # Ensure the directory exists
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)
+    with open(output_file, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerow(["Chapter Name", "Subchapter Name", "Part Heading", "Section Number", "Section Subject", "Section Text", "Citation", "Section Label"])
         for chapter in data["chapters"]:
