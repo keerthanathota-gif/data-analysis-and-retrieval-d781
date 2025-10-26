@@ -65,7 +65,7 @@ const glow = keyframes`
 
 // Styled Components
 const GradientContainer = styled(Box)(({ theme }) => ({
-  minHeight: '100vh',
+  height: '100vh',
   display: 'flex',
   position: 'relative',
   overflow: 'hidden',
@@ -78,10 +78,14 @@ const LeftPanel = styled(Box)(({ theme }) => ({
   justifyContent: 'center',
   padding: '40px 60px',
   background: 'white',
+  overflowY: 'auto',
   '@media (max-width: 960px)': {
     flex: 'unset',
     width: '100%',
-    padding: '40px 20px'
+    padding: '20px'
+  },
+  '@media (max-height: 800px)': {
+    padding: '20px 60px'
   }
 }));
 
@@ -119,13 +123,22 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   boxShadow: 'none',
   position: 'relative',
   zIndex: 1,
+  '@media (max-height: 800px)': {
+    padding: '24px 40px'
+  },
+  '@media (max-width: 960px)': {
+    padding: '24px 20px'
+  }
 }));
 
 const LogoBox = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   gap: '12px',
-  marginBottom: '48px',
+  marginBottom: '32px',
+  '@media (max-height: 800px)': {
+    marginBottom: '24px'
+  }
 }));
 
 const LogoIcon = styled(Box)(({ theme }) => ({

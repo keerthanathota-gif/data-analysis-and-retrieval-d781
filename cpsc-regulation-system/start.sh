@@ -33,7 +33,13 @@ source venv/bin/activate
 
 # Install dependencies
 echo "📥 Installing Python dependencies..."
-pip install -r requirements.txt
+pip install -q -r requirements.txt
+
+# Initialize database if it doesn't exist
+if [ ! -f "auth.db" ]; then
+    echo "🔧 Initializing authentication database..."
+    python3 init_db.py
+fi
 
 # Start backend in background
 echo "🚀 Starting FastAPI server..."
