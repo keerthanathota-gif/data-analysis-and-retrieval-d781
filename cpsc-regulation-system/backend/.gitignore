@@ -3,5 +3,9 @@
 *.sqlite3
 __pycache__/
 *.pyc
+*.pyo
 .env
 venv/
+*.egg-info/
+.pytest_cache/
+.coverage
