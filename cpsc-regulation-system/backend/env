@@ -1,0 +1,17 @@
+# OAuth Configuration
+
+# Frontend URL (for OAuth redirects)
+FRONTEND_URL=http://localhost:3000
+
+
+# JWT Secret (change in production!)
+SECRET_KEY=your-secret-key-change-in-production
+
+# Database URL (optional, defaults to SQLite)
+# DATABASE_URL=sqlite:///./cfr_data.db
+
+LLM_PROVIDER=azure
+AZURE_OPENAI_ENDPOINT=  
+AZURE_OPENAI_API_KEY=C
+AZURE_DEPLOYMENT_NAME=
+AZURE_OPENAI_API_VERSION=
