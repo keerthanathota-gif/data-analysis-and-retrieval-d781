@@ -639,14 +639,16 @@ const CFRDashboard = () => {
               <div style={{
                 width: '40px',
                 height: '40px',
-                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
                 borderRadius: '10px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: 'white'
               }}>
-                <i className="fas fa-rocket"></i>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
               </div>
               <h2>Data Pipeline Control</h2>
             </div>
@@ -659,17 +661,13 @@ const CFRDashboard = () => {
               marginBottom: '24px'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                <i className="fas fa-info-circle" style={{ color: '#10b981', fontSize: '1.1em' }}></i>
-                <strong style={{ color: '#065f46' }}>Pipeline Process</strong>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <strong style={{ color: '#065f46' }}>Enter CFR URLs to crawl, parse XML files, store in database, and generate AI embeddings. You can add multiple URLs.</strong>
               </div>
-              <p style={{
-                margin: 0,
-                color: '#047857',
-                fontSize: '0.9rem',
-                lineHeight: '1.6'
-              }}>
-                Enter CFR URLs to crawl, parse XML files, store in database, and generate AI embeddings. You can add multiple URLs.
-              </p>
             </div>
 
             <div className="form-group">
@@ -682,7 +680,6 @@ const CFRDashboard = () => {
                 color: '#0f172a',
                 marginBottom: '10px'
               }}>
-                <i className="fas fa-link" style={{ color: '#10b981' }}></i>
                 CFR URLs (one per line)
               </label>
               <textarea
@@ -726,7 +723,7 @@ const CFRDashboard = () => {
                   justifyContent: 'center',
                   gap: '10px',
                   padding: '14px 24px',
-                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
                   border: 'none',
                   borderRadius: '8px',
                   color: 'white',
@@ -735,10 +732,13 @@ const CFRDashboard = () => {
                   cursor: pipelineLoading ? 'not-allowed' : 'pointer',
                   opacity: pipelineLoading ? 0.6 : 1,
                   transition: 'all 0.2s',
-                  boxShadow: '0 2px 4px rgba(16, 185, 129, 0.2)'
+                  boxShadow: '0 2px 4px rgba(139, 92, 246, 0.3)'
                 }}
               >
-                <i className="fas fa-play"></i> Run Pipeline
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+                Run Pipeline
               </button>
               <button
                 className="btn btn-danger"
@@ -750,7 +750,7 @@ const CFRDashboard = () => {
                   justifyContent: 'center',
                   gap: '10px',
                   padding: '14px 24px',
-                  background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+                  background: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
                   border: 'none',
                   borderRadius: '8px',
                   color: 'white',
@@ -759,10 +759,14 @@ const CFRDashboard = () => {
                   cursor: pipelineLoading ? 'not-allowed' : 'pointer',
                   opacity: pipelineLoading ? 0.6 : 1,
                   transition: 'all 0.2s',
-                  boxShadow: '0 2px 4px rgba(249, 115, 22, 0.2)'
+                  boxShadow: '0 2px 4px rgba(236, 72, 153, 0.3)'
                 }}
               >
-                <i className="fas fa-trash-alt"></i> Reset Database
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+                Reset Database
               </button>
             </div>
           </div>
