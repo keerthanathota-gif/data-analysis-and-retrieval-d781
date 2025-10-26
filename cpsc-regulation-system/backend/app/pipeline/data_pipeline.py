@@ -59,14 +59,14 @@ class DataPipeline:
     def update_status(self, state: str = None, current_step: str = None, 
                      progress: int = None, error_message: str = None):
         """Update pipeline status"""
-        import time
+        from datetime import datetime
         
         if state:
             self.status['state'] = state
             if state == 'running' and not self.status['start_time']:
-                self.status['start_time'] = time.time()
+                self.status['start_time'] = datetime.now()
             elif state in ['completed', 'error']:
-                self.status['end_time'] = time.time()
+                self.status['end_time'] = datetime.now()
         
         if current_step:
             self.status['current_step'] = current_step
