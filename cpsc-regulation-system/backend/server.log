@@ -1,4 +1,12 @@
-Traceback (most recent call last):
-  File "/workspace/cpsc-regulation-system/backend/run.py", line 6, in <module>
-    import uvicorn
-ModuleNotFoundError: No module named 'uvicorn'
+INFO:     Started server process [2740]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+[OK] Authentication database initialized successfully
+CFR database initialized
+Default admin user created: username=admin, password=admin123
+[OK] Auth database initialized
+[OK] CFR database initialized
+[OK] Default admin user created
+INFO:     127.0.0.1:34592 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52398 - "GET /search/stats HTTP/1.1" 200 OK
