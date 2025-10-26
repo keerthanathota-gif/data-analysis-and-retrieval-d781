@@ -8,12 +8,23 @@ from app.config import CRAWL_URLS
 def download_and_extract_zip(url, extract_to='./data'):
     """
     Downloads a zip file from the given URL and extracts its contents.
-    Handles Windows-specific path issues.
+    Handles cross-platform path issues.
     """
     # Ensure the extract path exists and is properly formatted
     extract_to = os.path.abspath(extract_to)
+    print(f"Extract path (absolute): {extract_to}")
+    
     if not os.path.exists(extract_to):
-        os.makedirs(extract_to, exist_ok=True)
+        try:
+            os.makedirs(extract_to, exist_ok=True)
+            print(f"Created directory: {extract_to}")
+        except Exception as e:
+            print(f"ERROR creating directory {extract_to}: {e}")
+            raise
+    
+    # Verify the directory is writable
+    if not os.access(extract_to, os.W_OK):
+        raise PermissionError(f"Directory {extract_to} is not writable")
 
     print(f"Downloading from {url}")
     try:
@@ -26,24 +37,41 @@ def download_and_extract_zip(url, extract_to='./data'):
     try:
         zip_file = zipfile.ZipFile(io.BytesIO(response.content))
         
-        # Extract files one by one to handle Windows path issues
+        # Extract files one by one to handle cross-platform path issues
         for member in zip_file.namelist():
-            # Sanitize filename for Windows
-            filename = member.replace('\\', '/').strip()
-            if not filename:
-                continue
+            try:
+                # Sanitize filename for cross-platform compatibility
+                filename = member.replace('\\', '/').strip()
+                if not filename:
+                    continue
+                    
+                # Skip directory entries
+                if filename.endswith('/'):
+                    continue
+                    
+                # Get just the base filename (no path components)
+                base_filename = os.path.basename(filename)
                 
-            # Skip directory entries
-            if filename.endswith('/'):
-                continue
+                # Sanitize the filename to remove any invalid characters
+                # Remove or replace characters that might be problematic
+                base_filename = base_filename.replace(':', '_').replace('*', '_').replace('?', '_')
+                base_filename = base_filename.replace('"', '_').replace('<', '_').replace('>', '_')
+                base_filename = base_filename.replace('|', '_')
                 
-            # Create target path
-            target_path = os.path.join(extract_to, os.path.basename(filename))
-            
-            # Extract the file
-            with zip_file.open(member) as source:
-                with open(target_path, 'wb') as target:
-                    target.write(source.read())
+                # Create target path using absolute path
+                target_path = os.path.abspath(os.path.join(extract_to, base_filename))
+                
+                print(f"  Extracting: {base_filename} -> {target_path}")
+                
+                # Extract the file
+                with zip_file.open(member) as source:
+                    file_content = source.read()
+                    with open(target_path, 'wb') as target:
+                        target.write(file_content)
+            except Exception as e:
+                print(f"  ERROR extracting {member}: {type(e).__name__}: {str(e)}")
+                # Continue with other files instead of failing completely
+                continue
         
         print(f"Extracted to {extract_to}")
         return extract_to

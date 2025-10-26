@@ -72,39 +72,65 @@ def parse_chapter_subchapter_part_sections(xml_file):
 
 def save_json(data, output_file):
     """Save data to JSON file."""
-    # Ensure the directory exists
-    output_dir = os.path.dirname(output_file)
-    if output_dir:  # Only create directory if there's a path
-        os.makedirs(output_dir, exist_ok=True)
-    with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+    try:
+        # Normalize and resolve the output path
+        output_file = os.path.abspath(output_file)
+        # Ensure the directory exists
+        output_dir = os.path.dirname(output_file)
+        if output_dir:  # Only create directory if there's a path
+            os.makedirs(output_dir, exist_ok=True)
+        
+        # Verify the path is writable
+        if not os.access(output_dir, os.W_OK):
+            raise PermissionError(f"Directory {output_dir} is not writable")
+        
+        with open(output_file, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+    except Exception as e:
+        print(f"ERROR in save_json: {type(e).__name__}: {str(e)}")
+        print(f"  output_file: {output_file}")
+        print(f"  output_dir: {output_dir if 'output_dir' in locals() else 'N/A'}")
+        raise
 
 def save_csv(data, output_file):
     """Save data to CSV file."""
-    # Ensure the directory exists
-    output_dir = os.path.dirname(output_file)
-    if output_dir:  # Only create directory if there's a path
-        os.makedirs(output_dir, exist_ok=True)
-    with open(output_file, 'w', newline='', encoding='utf-8') as f:
-        writer = csv.writer(f)
-        writer.writerow(["Chapter Name", "Subchapter Name", "Part Heading", "Section Number", "Section Subject", "Section Text", "Citation", "Section Label"])
-        for chapter in data["chapters"]:
-            chapter_name = chapter["chapter_name"]
-            for subchapter in chapter["subchapters"]:
-                subchapter_name = subchapter["subchapter_name"]
-                for part in subchapter["parts"]:
-                    part_heading = part["heading"]
-                    for section in part["sections"]:
-                        writer.writerow([
-                            chapter_name,
-                            subchapter_name,
-                            part_heading,
-                            section["section_number"],
-                            section["subject"],
-                            section["text"],
-                            section.get("citation", ""),
-                            section.get("section_label", "")
-                        ])
+    try:
+        # Normalize and resolve the output path
+        output_file = os.path.abspath(output_file)
+        # Ensure the directory exists
+        output_dir = os.path.dirname(output_file)
+        if output_dir:  # Only create directory if there's a path
+            os.makedirs(output_dir, exist_ok=True)
+        
+        # Verify the path is writable
+        if not os.access(output_dir, os.W_OK):
+            raise PermissionError(f"Directory {output_dir} is not writable")
+        
+        with open(output_file, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.writer(f)
+            writer.writerow(["Chapter Name", "Subchapter Name", "Part Heading", "Section Number", "Section Subject", "Section Text", "Citation", "Section Label"])
+            for chapter in data["chapters"]:
+                chapter_name = chapter["chapter_name"]
+                for subchapter in chapter["subchapters"]:
+                    subchapter_name = subchapter["subchapter_name"]
+                    for part in subchapter["parts"]:
+                        part_heading = part["heading"]
+                        for section in part["sections"]:
+                            writer.writerow([
+                                chapter_name,
+                                subchapter_name,
+                                part_heading,
+                                section["section_number"],
+                                section["subject"],
+                                section["text"],
+                                section.get("citation", ""),
+                                section.get("section_label", "")
+                            ])
+    except Exception as e:
+        print(f"ERROR in save_csv: {type(e).__name__}: {str(e)}")
+        print(f"  output_file: {output_file}")
+        print(f"  output_dir: {output_dir if 'output_dir' in locals() else 'N/A'}")
+        raise
 
 # Example usage
 if __name__ == "__main__":

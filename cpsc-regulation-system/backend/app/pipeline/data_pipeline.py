@@ -31,13 +31,29 @@ class DataPipeline:
         Args:
             urls: List of URLs to crawl. If None, uses DEFAULT_CRAWL_URLS
         """
-        self.data_dir = DATA_DIR
-        self.output_dir = OUTPUT_DIR
+        # Use absolute paths to avoid any path resolution issues
+        self.data_dir = os.path.abspath(DATA_DIR)
+        self.output_dir = os.path.abspath(OUTPUT_DIR)
         self.crawl_urls = urls if urls else DEFAULT_CRAWL_URLS
         
+        print(f"Initializing DataPipeline:")
+        print(f"  data_dir: {self.data_dir}")
+        print(f"  output_dir: {self.output_dir}")
+        
         # Create directories if they don't exist
-        os.makedirs(self.data_dir, exist_ok=True)
-        os.makedirs(self.output_dir, exist_ok=True)
+        try:
+            os.makedirs(self.data_dir, exist_ok=True)
+            print(f"  Created/verified data_dir: {self.data_dir}")
+        except Exception as e:
+            print(f"  ERROR creating data_dir: {e}")
+            raise
+            
+        try:
+            os.makedirs(self.output_dir, exist_ok=True)
+            print(f"  Created/verified output_dir: {self.output_dir}")
+        except Exception as e:
+            print(f"  ERROR creating output_dir: {e}")
+            raise
         
         # Initialize database
         init_cfr_db()
@@ -184,17 +200,26 @@ class DataPipeline:
                 
                 # Save JSON and CSV outputs
                 base_name = os.path.splitext(os.path.basename(xml_file))[0]
-                json_output = os.path.join(self.output_dir, f"{base_name}.json")
-                csv_output = os.path.join(self.output_dir, f"{base_name}.csv")
+                # Sanitize base_name to avoid any path issues
+                base_name = base_name.replace(':', '_').replace('*', '_').replace('?', '_')
+                base_name = base_name.replace('"', '_').replace('<', '_').replace('>', '_')
+                base_name = base_name.replace('|', '_').replace('/', '_').replace('\\', '_')
+                
+                json_output = os.path.abspath(os.path.join(self.output_dir, f"{base_name}.json"))
+                csv_output = os.path.abspath(os.path.join(self.output_dir, f"{base_name}.csv"))
+                
+                print(f"    Saving to:")
+                print(f"      JSON: {json_output}")
+                print(f"      CSV: {csv_output}")
                 
                 save_json(parsed_data, json_output)
                 save_csv(parsed_data, csv_output)
                 
                 parsed_data_list.append(parsed_data)
-                print(f"    [OK] Saved to {json_output} and {csv_output}")
+                print(f"    [OK] Saved successfully")
             except Exception as e:
                 import traceback
-                print(f"    [ERROR] Error parsing {xml_file}: {e}")
+                print(f"    [ERROR] Error parsing {xml_file}: {type(e).__name__}: {e}")
                 print(f"    [ERROR] Traceback: {traceback.format_exc()}")
                 # Continue with next file instead of crashing
         
