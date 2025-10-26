@@ -12,7 +12,7 @@ from app.models.schemas import (
     PipelineRequest, PipelineResponse, PipelineStatus,
     ActivityLogResponse
 )
-from app.auth.dependencies import get_admin_user
+from app.auth.dependencies import get_current_active_user
 from app.auth.auth_service import AuthService
 from app.pipeline.data_pipeline import DataPipeline
 from app.services.analysis_service import AnalysisService
@@ -39,7 +39,7 @@ pipeline_status_global = {
 
 @router.get("/stats", response_model=AdminStats)
 async def get_admin_stats(
-    current_user = Depends(get_admin_user),
+    current_user = Depends(get_current_active_user),
     auth_db: Session = Depends(get_auth_db),
     cfr_db: Session = Depends(get_cfr_db)
 ):
@@ -72,7 +72,7 @@ async def get_admin_stats(
 async def get_all_users(
     skip: int = 0,
     limit: int = 100,
-    current_user = Depends(get_admin_user),
+    current_user = Depends(get_current_active_user),
     auth_db: Session = Depends(get_auth_db)
 ):
     """Get all users with pagination"""
