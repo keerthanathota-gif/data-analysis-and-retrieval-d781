@@ -323,23 +323,47 @@ const CFRDashboard = () => {
     };
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    window.location.href = '/login';
+  };
+
   return (
     <div className="app-container">
-      {/* Dashboard Layout with Vertical Navigation */}
+      {/* Dashboard Header */}
+      <div className="dashboard-header">
+        <div className="dashboard-header-left">
+          <div className="dashboard-logo">
+            <i className="fas fa-cube"></i>
+          </div>
+          <h1 className="dashboard-title">CFR Pipeline System</h1>
+        </div>
+        <button className="sign-out-btn" onClick={handleLogout}>
+          <i className="fas fa-sign-out-alt"></i>
+          Sign Out
+        </button>
+      </div>
+
       <div className="dashboard-layout">
-        {/* Navigation */}
+        {/* Horizontal Navigation Tabs */}
         <div className="nav-tabs">
-          <button className={`nav-tab ${activeTab === 'pipeline' ? 'active' : ''}`} onClick={() => setActiveTab('pipeline')}>
-            <i className="fas fa-database"></i>
-            <span>Pipeline</span>
+          <button 
+            className={`nav-tab ${activeTab === 'pipeline' ? 'active' : ''}`} 
+            onClick={() => setActiveTab('pipeline')}
+          >
+            Pipeline
           </button>
-          <button className={`nav-tab ${activeTab === 'advanced' ? 'active' : ''}`} onClick={() => setActiveTab('advanced')}>
-            <i className="fas fa-network-wired"></i>
-            <span>Analysis</span>
+          <button 
+            className={`nav-tab ${activeTab === 'advanced' ? 'active' : ''}`} 
+            onClick={() => setActiveTab('advanced')}
+          >
+            Analysis
           </button>
-          <button className={`nav-tab ${activeTab === 'rag' ? 'active' : ''}`} onClick={() => setActiveTab('rag')}>
-            <i className="fas fa-comments"></i>
-            <span>RAG Query</span>
+          <button 
+            className={`nav-tab ${activeTab === 'rag' ? 'active' : ''}`} 
+            onClick={() => setActiveTab('rag')}
+          >
+            RAG Query
           </button>
         </div>
 
