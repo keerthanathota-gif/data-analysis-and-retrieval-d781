@@ -10,6 +10,9 @@ const CFRDashboard = () => {
   const [pipelineUrls, setPipelineUrls] = useState('https://www.govinfo.gov/bulkdata/CFR/2025/title-16/');
   const [pipelineLoading, setPipelineLoading] = useState(false);
   const [pipelineResults, setPipelineResults] = useState(null);
+  const [showPipelineResults, setShowPipelineResults] = useState(false);
+  const [pipelineProgress, setPipelineProgress] = useState(0);
+  const [completedSteps, setCompletedSteps] = useState([]);
 
   // Chat/RAG state
   const [chatMessages, setChatMessages] = useState([
@@ -93,6 +96,9 @@ const CFRDashboard = () => {
 
     setPipelineLoading(true);
     setPipelineResults(null);
+    setShowPipelineResults(true);
+    setPipelineProgress(0);
+    setCompletedSteps([]);
 
     try {
       const urls = pipelineUrls.split('\n').map(url => url.trim()).filter(url => url.length > 0);
@@ -131,9 +137,20 @@ const CFRDashboard = () => {
       const status = response.data;
 
       setPipelineResults(status);
+      
+      // Update progress
+      if (status.progress !== undefined) {
+        setPipelineProgress(status.progress);
+      }
+      
+      // Update completed steps
+      if (status.steps_completed && Array.isArray(status.steps_completed)) {
+        setCompletedSteps(status.steps_completed);
+      }
 
       if (status.state === 'completed') {
         setPipelineLoading(false);
+        setPipelineProgress(100);
         await loadStats();
       } else if (status.state === 'error') {
         setPipelineLoading(false);
@@ -433,15 +450,17 @@ const CFRDashboard = () => {
       <div className="dashboard-layout">
         {/* Navigation Tabs */}
         <div className="nav-tabs">
-          <button className={`nav-tab ${activeTab === 'pipeline' ? 'active' : ''}`} onClick={() => setActiveTab('pipeline')}>
-            Pipeline
-          </button>
-          <button className={`nav-tab ${activeTab === 'advanced' ? 'active' : ''}`} onClick={() => setActiveTab('advanced')}>
-            Analysis
-          </button>
-          <button className={`nav-tab ${activeTab === 'rag' ? 'active' : ''}`} onClick={() => setActiveTab('rag')}>
-            RAG Query
-          </button>
+          <div className="tabs-container">
+            <button className={`nav-tab ${activeTab === 'pipeline' ? 'active' : ''}`} onClick={() => setActiveTab('pipeline')}>
+              Pipeline
+            </button>
+            <button className={`nav-tab ${activeTab === 'advanced' ? 'active' : ''}`} onClick={() => setActiveTab('advanced')}>
+              Analysis
+            </button>
+            <button className={`nav-tab ${activeTab === 'rag' ? 'active' : ''}`} onClick={() => setActiveTab('rag')}>
+              RAG Query
+            </button>
+          </div>
         </div>
 
         {/* Content Area */}
@@ -767,28 +786,90 @@ const CFRDashboard = () => {
             </div>
           </div>
 
-          {pipelineLoading && (
-            <div className="loading">
-              <div className="spinner"></div>
-              <p className="loading-text">Processing pipeline...</p>
-              {pipelineResults && (
-                <p style={{ marginTop: '10px', color: '#6366f1' }}>
-                  {pipelineResults.current_step || 'Starting...'}
-                </p>
-              )}
-            </div>
-          )}
+          {/* Pipeline Results - Modern Progress Design */}
+          {showPipelineResults && (
+            <div className="card">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+                <div>
+                  <h2>Pipeline Results</h2>
+                  <p style={{ fontSize: '13px', color: 'var(--text-light)', marginTop: '8px' }}>
+                    Track pipeline execution progress
+                  </p>
+                </div>
+                {pipelineResults?.state === 'completed' && (
+                  <div className="completion-badge">
+                    <span>✓</span>
+                    <span>Pipeline completed</span>
+                  </div>
+                )}
+              </div>
 
-          {pipelineResults && !pipelineLoading && (
-            <div className={`result-box ${pipelineResults.state === 'completed' ? 'success' : pipelineResults.state === 'error' ? 'error' : ''}`}>
-              <h3>Pipeline Results</h3>
-              <p>{pipelineResults.message || pipelineResults.error_message || 'Pipeline completed'}</p>
-              {pipelineResults.steps_completed && (
-                <ul>
-                  {pipelineResults.steps_completed.map((step, i) => (
-                    <li key={i}>✓ {step}</li>
-                  ))}
-                </ul>
+              <div className="progress-section">
+                <div className="progress-header">
+                  <span className="progress-label">Overall Progress</span>
+                  <span className="progress-percentage">{pipelineProgress}%</span>
+                </div>
+                <div className="progress-bar">
+                  <div className="progress-fill" style={{ width: `${pipelineProgress}%` }}></div>
+                </div>
+
+                <div className="pipeline-steps">
+                  <div className={`pipeline-step ${completedSteps.includes('Starting') || pipelineProgress > 0 ? 'completed' : ''}`}>
+                    <div className={`step-icon ${completedSteps.includes('Starting') || pipelineProgress > 0 ? 'completed' : 'pending'}`}>
+                      {completedSteps.includes('Starting') || pipelineProgress > 0 ? '✓' : '○'}
+                    </div>
+                    <div className="step-text">Starting</div>
+                  </div>
+                  <div className={`pipeline-step ${completedSteps.includes('Crawling data') || pipelineProgress >= 15 ? 'completed' : ''}`}>
+                    <div className={`step-icon ${completedSteps.includes('Crawling data') || pipelineProgress >= 15 ? 'completed' : 'pending'}`}>
+                      {completedSteps.includes('Crawling data') || pipelineProgress >= 15 ? '✓' : '○'}
+                    </div>
+                    <div className="step-text">Crawling data</div>
+                  </div>
+                  <div className={`pipeline-step ${completedSteps.includes('Parsing XML') || pipelineProgress >= 30 ? 'completed' : ''}`}>
+                    <div className={`step-icon ${completedSteps.includes('Parsing XML') || pipelineProgress >= 30 ? 'completed' : 'pending'}`}>
+                      {completedSteps.includes('Parsing XML') || pipelineProgress >= 30 ? '✓' : '○'}
+                    </div>
+                    <div className="step-text">Parsing XML</div>
+                  </div>
+                  <div className={`pipeline-step ${completedSteps.includes('Storing in database') || pipelineProgress >= 50 ? 'completed' : ''}`}>
+                    <div className={`step-icon ${completedSteps.includes('Storing in database') || pipelineProgress >= 50 ? 'completed' : 'pending'}`}>
+                      {completedSteps.includes('Storing in database') || pipelineProgress >= 50 ? '✓' : '○'}
+                    </div>
+                    <div className="step-text">Storing in database</div>
+                  </div>
+                  <div className={`pipeline-step ${completedSteps.includes('Generating embeddings') || pipelineProgress >= 70 ? 'completed' : ''}`}>
+                    <div className={`step-icon ${completedSteps.includes('Generating embeddings') || pipelineProgress >= 70 ? 'completed' : 'pending'}`}>
+                      {completedSteps.includes('Generating embeddings') || pipelineProgress >= 70 ? '✓' : '○'}
+                    </div>
+                    <div className="step-text">Generating embeddings</div>
+                  </div>
+                  <div className={`pipeline-step ${completedSteps.includes('Calculating statistics') || pipelineProgress >= 90 ? 'completed' : ''}`}>
+                    <div className={`step-icon ${completedSteps.includes('Calculating statistics') || pipelineProgress >= 90 ? 'completed' : 'pending'}`}>
+                      {completedSteps.includes('Calculating statistics') || pipelineProgress >= 90 ? '✓' : '○'}
+                    </div>
+                    <div className="step-text">Calculating statistics</div>
+                  </div>
+                  <div className={`pipeline-step ${completedSteps.includes('Completed') || pipelineProgress >= 100 ? 'completed' : ''}`}>
+                    <div className={`step-icon ${completedSteps.includes('Completed') || pipelineProgress >= 100 ? 'completed' : 'pending'}`}>
+                      {completedSteps.includes('Completed') || pipelineProgress >= 100 ? '✓' : '○'}
+                    </div>
+                    <div className="step-text">Completed</div>
+                  </div>
+                </div>
+              </div>
+
+              {pipelineResults?.state === 'error' && (
+                <div style={{
+                  marginTop: '20px',
+                  padding: '16px',
+                  background: '#fef2f2',
+                  borderRadius: '8px',
+                  border: '1px solid #fca5a5',
+                  color: '#991b1b'
+                }}>
+                  <strong>Error:</strong> {pipelineResults.error_message || 'Pipeline failed'}
+                </div>
               )}
             </div>
           )}
