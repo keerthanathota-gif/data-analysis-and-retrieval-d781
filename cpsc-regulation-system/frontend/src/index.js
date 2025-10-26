@@ -9,13 +9,13 @@ const theme = createTheme({
   palette: {
     mode: 'light',
     background: {
-      default: '#f7f8fa'
+      default: 'transparent'  // Allow gradient background to show
     },
     primary: {
-      main: '#1976d2',
+      main: '#6366f1',  // Updated to match new design
     },
     secondary: {
-      main: '#6c7a89',
+      main: '#8b5cf6',
     },
   },
   shape: {
@@ -35,6 +35,15 @@ const theme = createTheme({
     MuiAppBar: {
       defaultProps: {
         color: 'primary',
+      },
+    },
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+          backgroundAttachment: 'fixed',
+          minHeight: '100vh',
+        },
       },
     },
   },

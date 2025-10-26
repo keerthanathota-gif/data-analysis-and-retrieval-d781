@@ -23,8 +23,8 @@ const Layout = ({ children }) => {
     <Box
       sx={{
         minHeight: '100vh',
-        // Remove background color for auth pages so gradient fills edge-to-edge
-        bgcolor: isAuthPage ? 'transparent' : 'background.default',
+        // Keep transparent background to show gradient
+        bgcolor: 'transparent',
       }}
     >
       {isAuthenticated && (
@@ -32,7 +32,9 @@ const Layout = ({ children }) => {
           position="sticky"
           elevation={0}
           sx={{
-            background: 'linear-gradient(90deg, #0b5cab 0%, #1976d2 100%)'
+            background: 'linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%)',
+            backdropFilter: 'blur(10px)',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.2)'
           }}
         >
           <Toolbar>
