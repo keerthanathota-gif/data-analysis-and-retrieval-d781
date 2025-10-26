@@ -689,16 +689,6 @@ const AuthPage = () => {
               </Box>
             </Box>
           </FeatureCard>
-
-
-          <Box sx={{ mt: 5, pt: 4, borderTop: '1px solid rgba(255,255,255,0.2)' }}>
-            <Typography variant="caption" sx={{ opacity: 0.7, display: 'block', mb: 1 }}>
-              Trusted by compliance teams at
-            </Typography>
-            <Typography variant="body2" sx={{ opacity: 0.8 }}>
-              Fortune 500 • Legal Firms • Gov Agencies
-            </Typography>
-          </Box>
         </Box>
       </RightPanel>
     </GradientContainer>

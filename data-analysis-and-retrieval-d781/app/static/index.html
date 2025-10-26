@@ -80,55 +80,48 @@
             background: var(--input-bg);
         }
 
-        /* Tabs - Modern Minimal Design */
+        /* Tabs - Capsule Design */
         .tabs {
             background: linear-gradient(to bottom, #ffffff 0%, #faf5ff 100%);
             padding: 20px 32px;
             display: flex;
             justify-content: center;
-            gap: 12px;
             border-bottom: none;
         }
 
-        .tab {
-            padding: 14px 32px;
+        .tabs-container {
+            display: inline-flex;
+            gap: 8px;
             background: white;
+            padding: 6px;
+            border-radius: 50px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
             border: 1px solid #f3e8ff;
-            border-radius: 12px;
+        }
+
+        .tab {
+            padding: 10px 28px;
+            background: transparent;
+            border: none;
+            border-radius: 50px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             color: #6b7280;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            white-space: nowrap;
         }
 
         .tab:hover {
             color: var(--text);
             background: #faf5ff;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(139, 92, 246, 0.1);
         }
 
         .tab.active {
-            color: var(--primary);
+            color: var(--text);
             background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
-            border-color: var(--primary);
-            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60%;
-            height: 3px;
-            background: var(--primary);
-            border-radius: 2px;
+            box-shadow: 0 2px 6px rgba(139, 92, 246, 0.15);
         }
 
         /* Main Content */
@@ -468,7 +461,15 @@
 
         /* Pipeline Tab */
         .pipeline-content {
-            max-width: 900px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text);
         }
 
         .card {
@@ -480,9 +481,15 @@
         }
 
         .card h2 {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
-            margin-bottom: 16px;
+            margin-bottom: 8px;
+        }
+
+        .card-subtitle {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-bottom: 20px;
         }
 
         .form-group {
@@ -492,23 +499,31 @@
         .form-label {
             display: block;
             margin-bottom: 8px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
         }
 
         .form-input, .form-textarea {
             width: 100%;
-            padding: 12px 16px;
+            padding: 10px 14px;
             border: 1px solid var(--border);
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 13px;
             background: var(--input-bg);
             font-family: inherit;
         }
 
         .form-textarea {
             resize: vertical;
-            min-height: 100px;
+            min-height: 120px;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .form-hint {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-top: 8px;
         }
 
         .form-input:focus, .form-textarea:focus {
@@ -523,13 +538,18 @@
         }
 
         .btn {
-            padding: 12px 24px;
+            padding: 12px 28px;
             border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex: 1;
         }
 
         .btn-primary {
@@ -539,6 +559,19 @@
 
         .btn-primary:hover {
             background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
         }
 
         .btn-secondary {
@@ -558,35 +591,76 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 32px;
         }
 
         .stat-card {
             background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
-        .stat-value {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 4px;
+        .stat-card.teal {
+            background: linear-gradient(135deg, #e0f7f7 0%, #f0fffe 100%);
+        }
+
+        .stat-card.purple {
+            background: linear-gradient(135deg, #f3e8ff 0%, #faf5ff 100%);
+        }
+
+        .stat-card.blue {
+            background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .stat-icon.teal {
+            background: #14b8a6;
+            color: white;
+        }
+
+        .stat-icon.purple {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .stat-icon.blue {
+            background: #3b82f6;
+            color: white;
         }
 
         .stat-label {
-            font-size: 14px;
+            font-size: 12px;
             color: var(--text-light);
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text);
         }
 
         .alert {
-            padding: 16px;
+            padding: 14px;
             border-radius: 8px;
             margin-bottom: 16px;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .alert-info {
@@ -638,26 +712,100 @@
             100% { transform: rotate(360deg); }
         }
 
+        .progress-section {
+            margin-top: 24px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .progress-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .progress-percentage {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
         .progress-bar {
             width: 100%;
-            height: 8px;
-            background: var(--border);
-            border-radius: 8px;
+            height: 10px;
+            background: #e5e7eb;
+            border-radius: 10px;
             overflow: hidden;
-            margin: 16px 0;
+            margin-bottom: 24px;
         }
 
         .progress-fill {
             height: 100%;
-            background: var(--primary);
+            background: linear-gradient(90deg, #8b5cf6 0%, #a78bfa 100%);
             transition: width 0.3s;
         }
 
-        .progress-text {
-            text-align: center;
-            font-size: 14px;
-            color: var(--text-light);
-            margin-top: 8px;
+        .pipeline-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .pipeline-step {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+
+        .pipeline-step.completed {
+            background: #f0fdf4;
+        }
+
+        .step-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .step-icon.completed {
+            background: #22c55e;
+            color: white;
+        }
+
+        .step-icon.pending {
+            background: #e5e7eb;
+            color: #9ca3af;
+        }
+
+        .step-text {
+            font-size: 13px;
+            color: var(--text);
+        }
+
+        .completion-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #d1fae5;
+            color: #065f46;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 16px;
         }
 
         /* Results */
@@ -776,35 +924,131 @@
 
     <!-- Tabs -->
     <div class="tabs">
-        <button class="tab" onclick="switchTab('pipeline')">Pipeline</button>
-        <button class="tab" onclick="switchTab('analysis')">Analysis</button>
-        <button class="tab active" onclick="switchTab('rag')">RAG Query</button>
+        <div class="tabs-container">
+            <button class="tab active" onclick="switchTab('pipeline')">Pipeline</button>
+            <button class="tab" onclick="switchTab('analysis')">Analysis</button>
+            <button class="tab" onclick="switchTab('rag')">RAG Query</button>
+        </div>
     </div>
 
     <div class="container">
         <!-- Pipeline Tab -->
-        <div id="pipeline-tab" class="main-content">
+        <div id="pipeline-tab" class="main-content active">
             <div class="pipeline-content">
+                <!-- Database Statistics -->
+                <h2 class="section-title">Database Statistics</h2>
+                <div id="pipeline-stats" class="stats-grid">
+                    <div class="stat-card teal">
+                        <div class="stat-icon teal">📖</div>
+                        <div>
+                            <div class="stat-label">Total Chapters</div>
+                            <div class="stat-value" id="stat-chapters">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card purple">
+                        <div class="stat-icon purple">📋</div>
+                        <div>
+                            <div class="stat-label">Total Regulations</div>
+                            <div class="stat-value" id="stat-regulations">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card blue">
+                        <div class="stat-icon blue">📊</div>
+                        <div>
+                            <div class="stat-label">Total Embeddings</div>
+                            <div class="stat-value" id="stat-embeddings">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Pipeline Control -->
                 <div class="card">
-                    <h2>Data Pipeline Control</h2>
-                    <p style="color: var(--text-light); margin-bottom: 20px;">
-                        Enter CFR URLs to crawl, parse, store in database, and generate embeddings.
-                    </p>
+                    <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 20px;">
+                        <div style="width: 40px; height: 40px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; flex-shrink: 0;">▶</div>
+                        <div>
+                            <h2>Data Pipeline Control</h2>
+                            <p class="card-subtitle">Configure and execute data processing pipeline</p>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <strong>ℹ️</strong> Enter CFR URLs to crawl, parse XML files, store in database, and generate AI embeddings. You can add multiple URLs.
+                    </div>
                     
                     <div class="form-group">
                         <label class="form-label">CFR URLs (one per line)</label>
                         <textarea id="pipeline-urls" class="form-textarea" rows="4" placeholder="https://www.govinfo.gov/bulkdata/CFR/2025/title-16/">https://www.govinfo.gov/bulkdata/CFR/2025/title-16/</textarea>
+                        <div class="form-hint">Example: https://www.govinfo.gov/bulkdata/CFR/YEAR/title-NUMBER/</div>
                     </div>
                     
                     <div class="btn-group">
-                        <button class="btn btn-primary" onclick="runPipeline()">▶ Run Pipeline</button>
-                        <button class="btn btn-secondary" onclick="getStats()">📊 Get Statistics</button>
-                        <button class="btn btn-secondary" onclick="resetDatabase()">🗑️ Reset Database</button>
+                        <button class="btn btn-primary" onclick="runPipeline()">
+                            <span>▶</span>
+                            <span>Run Pipeline</span>
+                        </button>
+                        <button class="btn btn-danger" onclick="resetDatabase()">
+                            <span>🔄</span>
+                            <span>Reset Database</span>
+                        </button>
                     </div>
                 </div>
 
-                <div id="pipeline-stats" style="display: none;"></div>
-                <div id="pipeline-results"></div>
+                <!-- Pipeline Results -->
+                <div id="pipeline-results-container" style="display: none;">
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h2>Pipeline Results</h2>
+                            <div id="completion-badge" style="display: none;" class="completion-badge">
+                                <span>✓</span>
+                                <span>Pipeline completed</span>
+                            </div>
+                        </div>
+                        <p class="card-subtitle">Track pipeline execution progress</p>
+
+                        <div class="progress-section">
+                            <div class="progress-header">
+                                <span class="progress-label">Overall Progress</span>
+                                <span class="progress-percentage" id="progress-percentage">0%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progress-bar" style="width: 0%"></div>
+                            </div>
+
+                            <div class="pipeline-steps">
+                                <div class="pipeline-step" id="step-starting">
+                                    <div class="step-icon pending">○</div>
+                                    <div class="step-text">Starting</div>
+                                </div>
+                                <div class="pipeline-step" id="step-crawling">
+                                    <div class="step-icon pending">○</div>
+                                    <div class="step-text">Crawling data</div>
+                                </div>
+                                <div class="pipeline-step" id="step-parsing">
+                                    <div class="step-icon pending">○</div>
+                                    <div class="step-text">Parsing XML</div>
+                                </div>
+                                <div class="pipeline-step" id="step-storing">
+                                    <div class="step-icon pending">○</div>
+                                    <div class="step-text">Storing in database</div>
+                                </div>
+                                <div class="pipeline-step" id="step-embedding">
+                                    <div class="step-icon pending">○</div>
+                                    <div class="step-text">Generating embeddings</div>
+                                </div>
+                                <div class="pipeline-step" id="step-statistics">
+                                    <div class="step-icon pending">○</div>
+                                    <div class="step-text">Calculating statistics</div>
+                                </div>
+                                <div class="pipeline-step" id="step-completed">
+                                    <div class="step-icon pending">○</div>
+                                    <div class="step-text">Completed</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="pipeline-error" style="display: none;"></div>
                 <div id="pipeline-loading" class="loading">
                     <div class="spinner"></div>
                     <p>Processing pipeline...</p>
@@ -845,7 +1089,7 @@
         </div>
 
         <!-- RAG Query Tab -->
-        <div id="rag-tab" class="main-content active">
+        <div id="rag-tab" class="main-content">
             <div class="rag-layout">
                 <!-- Chat Container -->
                 <div class="chat-container">
@@ -1116,19 +1360,30 @@
 
         // Pipeline Functions
         async function runPipeline() {
-            const loading = document.getElementById('pipeline-loading');
-            const results = document.getElementById('pipeline-results');
             const urlsText = document.getElementById('pipeline-urls').value.trim();
+            const resultsContainer = document.getElementById('pipeline-results-container');
+            const errorDiv = document.getElementById('pipeline-error');
+            const completionBadge = document.getElementById('completion-badge');
             
             if (!urlsText) {
-                results.innerHTML = '<div class="alert alert-warning">Please enter at least one CFR URL</div>';
+                errorDiv.innerHTML = '<div class="alert alert-warning">⚠️ Please enter at least one CFR URL</div>';
+                errorDiv.style.display = 'block';
+                setTimeout(() => errorDiv.style.display = 'none', 3000);
                 return;
             }
             
             const urls = urlsText.split('\n').map(url => url.trim()).filter(url => url.length > 0);
             
-            loading.classList.add('active');
-            results.innerHTML = '';
+            // Reset and show results container
+            resultsContainer.style.display = 'block';
+            completionBadge.style.display = 'none';
+            errorDiv.style.display = 'none';
+            
+            // Reset all steps
+            resetPipelineSteps();
+            
+            // Update progress
+            updateProgress(0);
 
             try {
                 const response = await fetch(`${API_BASE}/api/pipeline/run`, {
@@ -1138,22 +1393,44 @@
                 });
                 const data = await response.json();
                 
-                results.innerHTML = `
-                    <div class="alert alert-info">
-                        <strong>Pipeline Started!</strong><br>
-                        Processing ${data.num_urls} URL(s) in the background.
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progress-bar" style="width: 0%"></div>
-                    </div>
-                    <div class="progress-text" id="progress-text">Starting...</div>
-                `;
-                
+                // Start polling status
                 pollPipelineStatus();
                 
             } catch (error) {
-                results.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
-                loading.classList.remove('active');
+                errorDiv.innerHTML = `<div class="alert alert-danger"><strong>Error:</strong> ${error.message}</div>`;
+                errorDiv.style.display = 'block';
+            }
+        }
+        
+        function resetPipelineSteps() {
+            const steps = ['starting', 'crawling', 'parsing', 'storing', 'embedding', 'statistics', 'completed'];
+            steps.forEach(step => {
+                const stepEl = document.getElementById(`step-${step}`);
+                if (stepEl) {
+                    stepEl.classList.remove('completed');
+                    const icon = stepEl.querySelector('.step-icon');
+                    icon.classList.remove('completed');
+                    icon.classList.add('pending');
+                    icon.textContent = '○';
+                }
+            });
+        }
+        
+        function updateProgress(percentage) {
+            const progressBar = document.getElementById('progress-bar');
+            const progressPercentage = document.getElementById('progress-percentage');
+            if (progressBar) progressBar.style.width = percentage + '%';
+            if (progressPercentage) progressPercentage.textContent = percentage + '%';
+        }
+        
+        function markStepCompleted(stepName) {
+            const stepEl = document.getElementById(`step-${stepName}`);
+            if (stepEl) {
+                stepEl.classList.add('completed');
+                const icon = stepEl.querySelector('.step-icon');
+                icon.classList.remove('pending');
+                icon.classList.add('completed');
+                icon.textContent = '✓';
             }
         }
 
@@ -1162,30 +1439,58 @@
         async function pollPipelineStatus() {
             if (statusPollingInterval) clearInterval(statusPollingInterval);
             
+            const stepMapping = {
+                'Starting': 'starting',
+                'Crawling': 'crawling',
+                'Crawling data': 'crawling',
+                'Parsing': 'parsing',
+                'Parsing XML': 'parsing',
+                'Storing': 'storing',
+                'Storing in database': 'storing',
+                'Generating embeddings': 'embedding',
+                'Calculating statistics': 'statistics',
+                'Completed': 'completed'
+            };
+            
             statusPollingInterval = setInterval(async () => {
                 try {
                     const response = await fetch(`${API_BASE}/api/pipeline/status`);
                     const status = await response.json();
                     
-                    const progressBar = document.getElementById('progress-bar');
-                    const progressText = document.getElementById('progress-text');
+                    // Update progress bar
+                    updateProgress(status.progress || 0);
                     
-                    if (progressBar && progressText) {
-                        progressBar.style.width = status.progress + '%';
-                        progressText.textContent = `${status.current_step || 'Processing'}... (${status.progress}%)`;
+                    // Mark completed steps
+                    if (status.steps_completed && Array.isArray(status.steps_completed)) {
+                        status.steps_completed.forEach(step => {
+                            const stepName = stepMapping[step] || step.toLowerCase().replace(/\s+/g, '-');
+                            markStepCompleted(stepName);
+                        });
                     }
                     
+                    // Mark current step if progress indicates
+                    const progress = status.progress || 0;
+                    if (progress > 0) markStepCompleted('starting');
+                    if (progress >= 15) markStepCompleted('crawling');
+                    if (progress >= 30) markStepCompleted('parsing');
+                    if (progress >= 50) markStepCompleted('storing');
+                    if (progress >= 70) markStepCompleted('embedding');
+                    if (progress >= 90) markStepCompleted('statistics');
+                    if (progress >= 100) markStepCompleted('completed');
+                    
+                    // Check if completed or error
                     if (status.state === 'completed' || status.state === 'error') {
                         clearInterval(statusPollingInterval);
-                        document.getElementById('pipeline-loading').classList.remove('active');
                         
                         if (status.state === 'completed') {
+                            updateProgress(100);
+                            markStepCompleted('completed');
+                            document.getElementById('completion-badge').style.display = 'flex';
                             getStats();
-                            document.getElementById('pipeline-results').innerHTML += 
-                                '<div class="alert alert-success"><strong>Pipeline Completed Successfully!</strong></div>';
                         } else {
-                            document.getElementById('pipeline-results').innerHTML += 
-                                `<div class="alert alert-danger"><strong>Error:</strong> ${status.error_message}</div>`;
+                            const errorDiv = document.getElementById('pipeline-error');
+                            errorDiv.innerHTML = `<div class="alert alert-danger"><strong>Error:</strong> ${status.error_message || 'Pipeline failed'}</div>`;
+                            errorDiv.style.display = 'block';
                         }
                     }
                 } catch (error) {
@@ -1199,31 +1504,16 @@
                 const response = await fetch(`${API_BASE}/api/pipeline/stats`);
                 const data = await response.json();
                 
-                const statsDiv = document.getElementById('pipeline-stats');
-                statsDiv.style.display = 'grid';
-                statsDiv.className = 'stats-grid';
-                statsDiv.innerHTML = `
-                    <div class="stat-card">
-                        <div class="stat-value">${data.chapters || 0}</div>
-                        <div class="stat-label">Chapters</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">${data.subchapters || 0}</div>
-                        <div class="stat-label">Subchapters</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">${data.sections || 0}</div>
-                        <div class="stat-label">Sections</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">${data.section_embeddings || 0}</div>
-                        <div class="stat-label">Embeddings</div>
-                    </div>
-                `;
+                // Update stat cards
+                document.getElementById('stat-chapters').textContent = data.chapters || 0;
+                document.getElementById('stat-regulations').textContent = (data.sections || 0).toLocaleString();
+                document.getElementById('stat-embeddings').textContent = (data.section_embeddings || 0).toLocaleString();
 
                 // Update embeddings count in sidebar
-                document.getElementById('embeddings-count').textContent = 
-                    (data.section_embeddings || 0).toLocaleString();
+                const embeddingsCountEl = document.getElementById('embeddings-count');
+                if (embeddingsCountEl) {
+                    embeddingsCountEl.textContent = (data.section_embeddings || 0).toLocaleString();
+                }
                 
             } catch (error) {
                 console.error('Error fetching stats:', error);
@@ -1242,21 +1532,34 @@
         }
 
         async function resetDatabase() {
-            if (!confirm('⚠️ WARNING: This will delete ALL data. Continue?')) return;
+            if (!confirm('⚠️ WARNING: This will delete ALL data including chapters, regulations, and embeddings. This action cannot be undone.\n\nAre you sure you want to continue?')) return;
             
-            const loading = document.getElementById('pipeline-loading');
-            const results = document.getElementById('pipeline-results');
+            const errorDiv = document.getElementById('pipeline-error');
+            const resultsContainer = document.getElementById('pipeline-results-container');
             
-            loading.classList.add('active');
+            errorDiv.innerHTML = '<div class="alert alert-info">🔄 Resetting database...</div>';
+            errorDiv.style.display = 'block';
 
             try {
                 await fetch(`${API_BASE}/api/pipeline/reset`, { method: 'POST' });
-                results.innerHTML = '<div class="alert alert-success"><strong>Database Reset Complete!</strong></div>';
-                getStats();
+                errorDiv.innerHTML = '<div class="alert alert-success"><strong>✓ Database Reset Complete!</strong> All data has been cleared.</div>';
+                
+                // Reset stats
+                document.getElementById('stat-chapters').textContent = '0';
+                document.getElementById('stat-regulations').textContent = '0';
+                document.getElementById('stat-embeddings').textContent = '0';
+                
+                // Hide results container
+                resultsContainer.style.display = 'none';
+                
+                // Refresh stats
+                setTimeout(() => {
+                    getStats();
+                    errorDiv.style.display = 'none';
+                }, 3000);
+                
             } catch (error) {
-                results.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
-            } finally {
-                loading.classList.remove('active');
+                errorDiv.innerHTML = `<div class="alert alert-danger"><strong>Error:</strong> ${error.message}</div>`;
             }
         }
 
