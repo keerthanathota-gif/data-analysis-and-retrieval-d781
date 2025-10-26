@@ -157,9 +157,9 @@ def init_cfr_db():
     """Initialize CFR database and create all tables"""
     try:
         Base.metadata.create_all(bind=engine)
-        print(f"✓ CFR database initialized successfully")
+        print(f"[OK] CFR database initialized successfully")
     except Exception as e:
-        print(f"✗ Error initializing CFR database: {e}")
+        print(f"[ERROR] Error initializing CFR database: {e}")
         raise
 
 def reset_cfr_db():

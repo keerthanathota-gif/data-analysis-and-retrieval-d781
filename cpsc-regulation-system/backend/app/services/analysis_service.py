@@ -193,7 +193,7 @@ class AnalysisService:
                     results.append(result)
         
         db.commit()
-        print(f"  ✓ Found {len(results)} similar pairs (from {comparisons_done} comparisons)")
+        print(f"  [OK] Found {len(results)} similar pairs (from {comparisons_done} comparisons)")
         
         # Sort by similarity score (descending)
         results.sort(key=lambda x: x['similarity_score'], reverse=True)

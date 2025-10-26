@@ -9,3 +9,6 @@ venv/
 *.egg-info/
 .pytest_cache/
 .coverage
+cfr_data/
+output/
+visualizations/

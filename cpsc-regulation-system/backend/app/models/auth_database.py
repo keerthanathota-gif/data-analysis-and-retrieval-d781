@@ -85,9 +85,9 @@ def init_auth_db():
     """Initialize authentication database and create all tables"""
     try:
         Base.metadata.create_all(bind=engine)
-        print(f"✓ Authentication database initialized successfully")
+        print(f"[OK] Authentication database initialized successfully")
     except Exception as e:
-        print(f"✗ Error initializing authentication database: {e}")
+        print(f"[ERROR] Error initializing authentication database: {e}")
         raise
 
 def reset_auth_db():

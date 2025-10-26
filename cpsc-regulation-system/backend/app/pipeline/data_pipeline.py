@@ -132,7 +132,7 @@ class DataPipeline:
                 
         except Exception as e:
             self.update_status(state='error', error_message=str(e))
-            print(f"\n❌ Pipeline failed: {e}")
+            print(f"\n[ERROR] Pipeline failed: {e}")
             raise
     
     def crawl_data(self):
@@ -175,9 +175,9 @@ class DataPipeline:
                 save_csv(parsed_data, csv_output)
                 
                 parsed_data_list.append(parsed_data)
-                print(f"    ✓ Saved to {json_output} and {csv_output}")
+                print(f"    [OK] Saved to {json_output} and {csv_output}")
             except Exception as e:
-                print(f"    ✗ Error parsing {xml_file}: {e}")
+                print(f"    [ERROR] Error parsing {xml_file}: {e}")
         
         return parsed_data_list
     
@@ -224,10 +224,10 @@ class DataPipeline:
                                 db.add(section)
             
             db.commit()
-            print("  ✓ Data stored successfully")
+            print("  [OK] Data stored successfully")
         except Exception as e:
             db.rollback()
-            print(f"  ✗ Error storing data: {e}")
+            print(f"  [ERROR] Error storing data: {e}")
             raise
         finally:
             db.close()
@@ -302,11 +302,11 @@ class DataPipeline:
                     db.add(section_embedding)
                 
                 db.commit()
-            
-            print("  ✓ Embeddings generated successfully")
+
+            print("  [OK] Embeddings generated successfully")
         except Exception as e:
             db.rollback()
-            print(f"  ✗ Error generating embeddings: {e}")
+            print(f"  [ERROR] Error generating embeddings: {e}")
             raise
         finally:
             db.close()

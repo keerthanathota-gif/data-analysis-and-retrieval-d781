@@ -49,14 +49,14 @@ class LLMService:
                     self.azure_deployment = AZURE_OPENAI_DEPLOYMENT
                     self.azure_temperature = AZURE_OPENAI_TEMPERATURE
                     self.azure_max_tokens = AZURE_OPENAI_MAX_TOKENS
-                    print(f"✓ Azure OpenAI initialized with deployment: {AZURE_OPENAI_DEPLOYMENT}")
+                    print(f"[OK] Azure OpenAI initialized with deployment: {AZURE_OPENAI_DEPLOYMENT}")
                     return
                 except Exception as e:
-                    print(f"⚠ Failed to initialize Azure OpenAI: {e}")
+                    print(f"[WARNING] Failed to initialize Azure OpenAI: {e}")
                     print("  Falling back to local model...")
                     self.use_azure = False
             else:
-                print("⚠ Azure OpenAI not configured or library not installed")
+                print("[WARNING] Azure OpenAI not configured or library not installed")
                 print("  Falling back to local model...")
                 self.use_azure = False
         
@@ -67,7 +67,7 @@ class LLMService:
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.model.to(self.device)
         
-        print(f"✓ LLM model (FLAN-T5) loaded on {self.device}")
+        print(f"[OK] LLM model (FLAN-T5) loaded on {self.device}")
     
     def generate_text(self, prompt: str, max_length: int = 256) -> str:
         """
