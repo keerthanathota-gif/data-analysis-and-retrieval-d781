@@ -1,173 +1,369 @@
 """
-Mock LLM Service for CFR Agentic AI Application
-This is a simplified version that doesn't require ML libraries
+LLM Service for CFR Agentic AI Application
+Supports both local models (FLAN-T5) and Azure OpenAI
 """
 
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+import torch
+from typing import List, Dict, Any, Optional
 import re
-from typing import List, Dict, Any
+import os
+
+# Try to import Azure OpenAI (optional)
+try:
+    from openai import AzureOpenAI
+    AZURE_AVAILABLE = True
+except ImportError:
+    AZURE_AVAILABLE = False
+
 
 class LLMService:
-    def __init__(self, model_name: str = "mock-llm"):
+    def __init__(self, model_name: str = "google/flan-t5-base", use_azure: bool = False):
         """
-        Initialize mock LLM service
+        Initialize LLM service with either local model or Azure OpenAI
         
         Args:
-            model_name: Model name (ignored in mock)
+            model_name: HuggingFace model name (default: flan-t5-base for quality)
+            use_azure: Whether to use Azure OpenAI instead of local model
         """
-        self.model_name = model_name
-        print(f"Mock LLM service initialized (no actual model loaded)")
+        self.use_azure = use_azure
+        
+        # Try to use Azure OpenAI if requested and configured
+        if use_azure:
+            from app.config import (
+                AZURE_OPENAI_API_KEY,
+                AZURE_OPENAI_ENDPOINT,
+                AZURE_OPENAI_DEPLOYMENT,
+                AZURE_OPENAI_API_VERSION,
+                AZURE_OPENAI_TEMPERATURE,
+                AZURE_OPENAI_MAX_TOKENS
+            )
+            
+            if AZURE_OPENAI_API_KEY and AZURE_OPENAI_ENDPOINT and AZURE_AVAILABLE:
+                try:
+                    self.azure_client = AzureOpenAI(
+                        api_key=AZURE_OPENAI_API_KEY,
+                        api_version=AZURE_OPENAI_API_VERSION,
+                        azure_endpoint=AZURE_OPENAI_ENDPOINT
+                    )
+                    self.azure_deployment = AZURE_OPENAI_DEPLOYMENT
+                    self.azure_temperature = AZURE_OPENAI_TEMPERATURE
+                    self.azure_max_tokens = AZURE_OPENAI_MAX_TOKENS
+                    print(f"✓ Azure OpenAI initialized with deployment: {AZURE_OPENAI_DEPLOYMENT}")
+                    return
+                except Exception as e:
+                    print(f"⚠ Failed to initialize Azure OpenAI: {e}")
+                    print("  Falling back to local model...")
+                    self.use_azure = False
+            else:
+                print("⚠ Azure OpenAI not configured or library not installed")
+                print("  Falling back to local model...")
+                self.use_azure = False
+        
+        # Use local model (FLAN-T5)
+        print(f"Loading LLM model: {model_name}")
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+        self.model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.model.to(self.device)
+        
+        print(f"✓ LLM model (FLAN-T5) loaded on {self.device}")
     
     def generate_text(self, prompt: str, max_length: int = 256) -> str:
         """
-        Generate mock text based on prompt patterns
+        Generate text using either Azure OpenAI or local FLAN-T5
         
         Args:
             prompt: Input prompt
             max_length: Maximum length of generated text
             
         Returns:
-            Generated mock text
+            Generated text
         """
-        # Simple pattern-based responses
-        if "explain" in prompt.lower() and "parity" in prompt.lower():
-            if "passed" in prompt:
-                return "The item passed parity check, indicating proper structure and balanced content distribution."
-            else:
-                return "The item failed parity check, suggesting potential structural issues or imbalanced content."
+        if self.use_azure:
+            return self._generate_azure(prompt, max_length)
+        else:
+            return self._generate_local(prompt, max_length)
+    
+    def _generate_azure(self, prompt: str, max_length: int) -> str:
+        """Generate text using Azure OpenAI"""
+        try:
+            response = self.azure_client.chat.completions.create(
+                model=self.azure_deployment,
+                messages=[
+                    {"role": "system", "content": "You are a helpful assistant that analyzes regulatory content."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=self.azure_temperature,
+                max_tokens=min(max_length, self.azure_max_tokens)
+            )
+            return response.choices[0].message.content.strip()
+        except Exception as e:
+            print(f"Error generating with Azure OpenAI: {e}")
+            return "Error generating response"
+    
+    def _generate_local(self, prompt: str, max_length: int) -> str:
+        """Generate text using local FLAN-T5 model"""
+        inputs = self.tokenizer(prompt, return_tensors="pt", max_length=512, truncation=True)
+        inputs = {k: v.to(self.device) for k, v in inputs.items()}
         
-        if "redundant" in prompt.lower():
-            if "are redundant" in prompt:
-                return "These items show significant similarity and overlap. Consider consolidating them to reduce duplication and improve clarity."
-            else:
-                return "While similar in some aspects, these items serve distinct regulatory purposes and should remain separate."
+        with torch.no_grad():
+            outputs = self.model.generate(
+                **inputs,
+                max_length=max_length,
+                num_beams=4,
+                early_stopping=True,
+                temperature=0.7,
+                do_sample=False  # Use beam search for better quality
+            )
         
-        if "overlap" in prompt.lower():
-            return "These items share common regulatory themes including compliance requirements, safety standards, and reporting procedures."
-        
-        if "summarize" in prompt.lower():
-            return "This group contains related regulatory content focusing on compliance, safety standards, and procedural requirements."
-        
-        if "name" in prompt.lower() or "title" in prompt.lower():
-            return "Regulatory Standards Group"
-        
-        # Default response
-        return "This item contains regulatory information relevant to compliance and safety standards."
+        generated_text = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+        return generated_text.strip()
     
     def generate_parity_justification(self, item_type: str, item_name: str, 
                                      check_result: bool, details: Dict) -> str:
         """
-        Generate mock justification for parity check
+        Generate LLM justification for parity check
+        
+        Args:
+            item_type: Type of item (chapter/subchapter/section)
+            item_name: Name of the item
+            check_result: Whether parity check passed
+            details: Details about the parity check
+            
+        Returns:
+            LLM-generated justification
         """
-        if check_result:
-            if item_type == "chapter":
-                count = details.get('subchapter_count', 0)
-                return f"The chapter contains {count} subchapters, providing a well-structured organization of regulatory content."
-            elif item_type == "subchapter":
-                count = details.get('part_count', 0)
-                return f"The subchapter contains {count} parts, offering detailed coverage of specific regulatory areas."
-            elif item_type == "section":
-                length = details.get('text_length', 0)
-                return f"The section contains {length} characters, providing comprehensive regulatory guidance."
-            else:
-                return f"The {item_type} passed parity check with proper structure."
+        status = "passed" if check_result else "failed"
+        
+        if item_type == "chapter":
+            count = details.get('subchapter_count', 0)
+            prompt = f"Explain why a chapter with {count} subchapters {status} the parity check. What does this indicate about its structure?"
+        elif item_type == "subchapter":
+            count = details.get('part_count', 0)
+            prompt = f"Explain why a subchapter with {count} parts {status} the parity check. What does this mean for content organization?"
+        elif item_type == "section":
+            length = details.get('text_length', 0)
+            prompt = f"Explain why a section with {length} characters of text {status} the parity check. What does this indicate?"
         else:
-            if item_type == "chapter":
-                return "The chapter may have insufficient subchapters for comprehensive coverage."
-            elif item_type == "subchapter":
-                return "The subchapter may need additional parts for complete regulatory guidance."
-            elif item_type == "section":
-                return "The section may require more detailed content for clarity."
+            prompt = f"Explain the parity check result for this {item_type}."
+        
+        response = self.generate_text(prompt, max_length=128)
+        
+        # Fallback if generation is poor
+        if len(response) < 10:
+            if check_result:
+                response = f"The {item_type} passed parity check, indicating proper structure and content organization."
             else:
-                return f"The {item_type} failed parity check and may need structural improvements."
+                response = f"The {item_type} failed parity check, suggesting structural issues or missing content."
+        
+        return response
     
     def generate_redundancy_justification(self, item1_name: str, item2_name: str,
                                          similarity_score: float, is_redundant: bool,
                                          overlap_content: str = None) -> str:
         """
-        Generate mock justification for redundancy check
+        Generate LLM justification for redundancy check
+        
+        Args:
+            item1_name: Name of first item
+            item2_name: Name of second item
+            similarity_score: Similarity score (0-1)
+            is_redundant: Whether items are redundant
+            overlap_content: Overlapping content sample
+            
+        Returns:
+            LLM-generated justification
         """
         percent = int(similarity_score * 100)
         
+        # Truncate names if too long
+        name1 = item1_name[:60] if len(item1_name) > 60 else item1_name
+        name2 = item2_name[:60] if len(item2_name) > 60 else item2_name
+        
         if is_redundant:
-            return f"These items show {percent}% similarity, indicating significant redundancy. Consider consolidating them to eliminate duplication and improve clarity."
+            prompt = f"Two regulatory items '{name1}' and '{name2}' have {percent}% similarity. Explain why they are redundant and suggest if they should be consolidated."
         else:
-            return f"While {percent}% similar, these items address different regulatory aspects and should remain separate for comprehensive coverage."
+            prompt = f"Two regulatory items '{name1}' and '{name2}' have {percent}% similarity but are not redundant. Explain why they should remain separate."
+        
+        response = self.generate_text(prompt, max_length=150)
+        
+        # Fallback if generation is poor
+        if len(response) < 10:
+            if is_redundant:
+                response = f"These items show {percent}% similarity, indicating significant redundancy. Consider consolidating them to reduce duplication."
+            else:
+                response = f"While {percent}% similar, these items serve distinct purposes and should remain separate."
+        
+        return response
     
     def generate_overlap_explanation(self, item1_name: str, item2_name: str,
                                     similarity_score: float) -> str:
         """
-        Generate mock explanation for overlapping content
+        Generate explanation for overlapping content
+        
+        Args:
+            item1_name: Name of first item
+            item2_name: Name of second item
+            similarity_score: Similarity score
+            
+        Returns:
+            Explanation of overlap
         """
         percent = int(similarity_score * 100)
-        return f"These items share {percent}% similarity, primarily in areas of compliance requirements, safety standards, and procedural guidelines."
+        
+        # Truncate names if too long
+        name1 = item1_name[:50] if len(item1_name) > 50 else item1_name
+        name2 = item2_name[:50] if len(item2_name) > 50 else item2_name
+        
+        prompt = f"Explain what content overlaps between regulatory items '{name1}' and '{name2}' which have {percent}% similarity. What themes or topics do they share?"
+        
+        response = self.generate_text(prompt, max_length=128)
+        
+        # Fallback if generation is poor
+        if len(response) < 10:
+            response = f"These items share {percent}% similarity, likely overlapping in regulatory requirements, compliance standards, or policy guidelines."
+        
+        return response
     
     def generate_cluster_summary(self, cluster_items: List[Dict[str, Any]], 
                                 cluster_type: str) -> str:
         """
-        Generate mock summary for a cluster
-        """
-        count = len(cluster_items)
+        Generate summary for a cluster based on actual content
         
-        # Try to extract some meaningful info from the first few items
-        topics = []
-        for item in cluster_items[:3]:
+        Args:
+            cluster_items: List of items in the cluster with text content
+            cluster_type: Type of cluster (chapter/subchapter/section)
+            
+        Returns:
+            LLM-generated cluster summary
+        """
+        # Collect actual text content from cluster items
+        text_samples = []
+        subjects = []
+        
+        for item in cluster_items[:5]:  # Analyze first 5 items for summary
+            # Get subject/name
             if cluster_type == 'section':
-                subject = item.get('subject', '')
+                subject = item.get('subject', '') or item.get('section_number', '')
             else:
                 subject = item.get('name', '')
             
             if subject:
-                # Extract key words
-                words = subject.split()[:5]
-                topics.extend(words)
+                subjects.append(subject)
+            
+            # Get text content
+            text = item.get('text', '')
+            if text:
+                # Sample first 200 characters of text
+                text_samples.append(text[:200])
         
-        if topics:
-            topic_str = " ".join(list(set(topics))[:5])
-            return f"This cluster contains {count} {cluster_type}s covering {topic_str} and related regulatory requirements."
+        # If we have text content, use it for better summary
+        if text_samples:
+            combined_text = " ".join(text_samples)
+            # Truncate to prevent token limit
+            combined_text = combined_text[:800]
+            
+            prompt = f"Summarize the common regulatory theme and purpose of this cluster of {len(cluster_items)} {cluster_type}s. Content sample: {combined_text}"
+            
+            response = self.generate_text(prompt, max_length=150)
+        elif subjects:
+            # Fallback to subjects if no text
+            subjects_text = ", ".join(subjects[:3])
+            prompt = f"Summarize the common theme of this cluster containing {len(cluster_items)} {cluster_type}s: {subjects_text}"
+            response = self.generate_text(prompt, max_length=128)
         else:
-            return f"This cluster groups {count} {cluster_type}s with related regulatory content focusing on compliance and safety standards."
+            # Final fallback
+            return f"This cluster contains {len(cluster_items)} {cluster_type}s with related regulatory content."
+        
+        # Validate response quality
+        if len(response) < 15:
+            response = f"This cluster groups {len(cluster_items)} {cluster_type}s covering similar regulatory requirements and compliance standards."
+        
+        return response
     
     def generate_cluster_name(self, cluster_items: List[Dict[str, Any]],
                              cluster_type: str, summary: str = None) -> str:
         """
-        Generate a mock name for a cluster
+        Generate a descriptive name for a cluster based on content
+        
+        Args:
+            cluster_items: List of items in the cluster
+            cluster_type: Type of cluster
+            summary: Optional cluster summary
+            
+        Returns:
+            Suggested cluster name (short)
         """
-        # Try to extract meaningful words from items
-        words = []
-        for item in cluster_items[:3]:
+        # Use summary if available for better naming
+        if summary and len(summary) > 20:
+            prompt = f"Generate a short descriptive name (3-6 words) for this cluster: {summary[:200]}"
+            name = self.generate_text(prompt, max_length=20)
+            
+            # Clean up the name
+            name = re.sub(r'["\']', '', name)
+            name = name.strip('.,;')
+            
+            # Validate and return if good
+            if len(name) > 5 and len(name) < 60:
+                return name
+        
+        # Fallback: extract from subjects/names
+        subjects = []
+        for item in cluster_items[:5]:
             if cluster_type == 'section':
                 subject = item.get('subject', '')
             else:
                 subject = item.get('name', '')
             
-            if subject:
-                # Get first significant word
-                for word in subject.split():
-                    if len(word) > 3 and word.lower() not in ['the', 'and', 'for', 'with']:
-                        words.append(word.capitalize())
-                        break
+            if subject and len(subject) < 80:
+                subjects.append(subject)
         
-        if words:
-            return f"{' '.join(words[:2])} Standards Group"
-        else:
-            return f"{cluster_type.capitalize()} Regulatory Group"
+        if subjects:
+            subjects_text = "; ".join(subjects[:3])
+            prompt = f"Generate a concise name (4-6 words) for a cluster of {cluster_type}s including: {subjects_text}"
+            name = self.generate_text(prompt, max_length=20)
+            
+            # Clean up
+            name = re.sub(r'["\']', '', name)
+            name = name.strip('.,;')
+            
+            if len(name) > 5 and len(name) < 60:
+                return name
+        
+        # Final fallback
+        return f"{cluster_type.capitalize()} Group {len(cluster_items)} Items"
     
     def generate_section_summary(self, section_text: str, section_subject: str) -> str:
         """
-        Generate a mock summary of a section
+        Generate a brief summary of a section
+        
+        Args:
+            section_text: Full section text
+            section_subject: Section subject/title
+            
+        Returns:
+            Brief summary
         """
-        if section_subject:
-            return f"This section on '{section_subject}' provides regulatory guidance on compliance requirements and implementation procedures."
-        else:
-            return "This section contains important regulatory information for compliance and safety standards."
+        # Truncate text if too long
+        text_sample = section_text[:500] if section_text else ""
+        
+        prompt = f"Summarize this regulation section titled '{section_subject}': {text_sample}"
+        
+        return self.generate_text(prompt, max_length=150)
 
 
 # Global instance
 llm_service = None
 
-def get_llm_service():
-    """Get or create mock LLM service instance"""
+def get_llm_service(use_azure: bool = False):
+    """
+    Get or create LLM service instance (lazy loading)
+    
+    Args:
+        use_azure: Whether to use Azure OpenAI (checks config for credentials)
+    """
     global llm_service
     if llm_service is None:
-        llm_service = LLMService()
+        llm_service = LLMService(use_azure=use_azure)
     return llm_service

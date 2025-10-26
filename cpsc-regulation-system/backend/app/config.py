@@ -103,6 +103,14 @@ APPLE_REDIRECT_URI = os.getenv(
     "APPLE_REDIRECT_URI", "http://localhost:8000/auth/oauth/apple/callback"
 )
 
+# Azure OpenAI Configuration (optional - for advanced LLM features)
+AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY", "")
+AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT", "")
+AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT", "gpt-4")
+AZURE_OPENAI_API_VERSION = os.getenv("AZURE_OPENAI_API_VERSION", "2024-02-15-preview")
+AZURE_OPENAI_TEMPERATURE = float(os.getenv("AZURE_OPENAI_TEMPERATURE", "0.7"))
+AZURE_OPENAI_MAX_TOKENS = int(os.getenv("AZURE_OPENAI_MAX_TOKENS", "1000"))
+
 # CORS settings
 ALLOWED_ORIGINS = [
     "http://localhost:3000",  # React dev server
