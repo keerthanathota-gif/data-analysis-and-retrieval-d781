@@ -18,13 +18,29 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Check if user is logged in on app start
     const token = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
+    
     if (token) {
+      // First, try to use stored user data for immediate authentication
+      if (storedUser) {
+        try {
+          const userData = JSON.parse(storedUser);
+          setUser(userData);
+        } catch (e) {
+          console.error('Error parsing stored user data:', e);
+        }
+      }
+      
+      // Then fetch fresh user data from server
       authService.getCurrentUser()
         .then(userData => {
           setUser(userData);
+          localStorage.setItem('user', JSON.stringify(userData));
         })
         .catch(() => {
           localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          setUser(null);
         })
         .finally(() => {
           setLoading(false);
@@ -38,6 +54,10 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await authService.login(username, password);
       localStorage.setItem('token', response.access_token);
+      
+      // Store user data in localStorage for immediate access
+      localStorage.setItem('user', JSON.stringify(response.user));
+      
       setUser(response.user);
       return response;
     } catch (error) {
@@ -49,6 +69,10 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await authService.adminLogin(username, password);
       localStorage.setItem('token', response.access_token);
+      
+      // Store user data in localStorage for immediate access
+      localStorage.setItem('user', JSON.stringify(response.user));
+      
       setUser(response.user);
       return response;
     } catch (error) {
@@ -72,6 +96,7 @@ export const AuthProvider = ({ children }) => {
       console.error('Logout error:', error);
     } finally {
       localStorage.removeItem('token');
+      localStorage.removeItem('user');
       setUser(null);
     }
   };
@@ -79,6 +104,7 @@ export const AuthProvider = ({ children }) => {
   const updateUser = async (userData) => {
     try {
       const response = await authService.updateUser(userData);
+      localStorage.setItem('user', JSON.stringify(response));
       setUser(response);
       return response;
     } catch (error) {

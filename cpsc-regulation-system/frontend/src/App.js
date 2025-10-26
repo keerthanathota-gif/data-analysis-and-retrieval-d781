@@ -4,7 +4,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import AuthPage from './pages/AuthPage';
 import OAuthCallbackPage from './pages/OAuthCallbackPage';
-import UnifiedDashboard from './pages/UnifiedDashboard';
+import CFRDashboard from './pages/CFRDashboard';
 import Layout from './components/Layout';
 
 function App() {
@@ -19,7 +19,7 @@ function App() {
             path="/dashboard" 
             element={
               <ProtectedRoute>
-                <UnifiedDashboard />
+                <CFRDashboard />
               </ProtectedRoute>
             } 
           />
