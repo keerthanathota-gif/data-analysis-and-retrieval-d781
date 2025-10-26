@@ -18,14 +18,22 @@
   --text-light: #64748b;
 }
 
+body {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  min-height: 100vh;
+  padding: 20px;
+}
+
 .app-container {
   max-width: 1600px;
   margin: 20px auto;
-  background: white;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
   border-radius: 24px;
   box-shadow: 0 20px 60px rgba(0,0,0,0.3);
   overflow: hidden;
   animation: slideUp 0.6s ease-out;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 @keyframes slideUp {
@@ -39,91 +47,37 @@
   }
 }
 
-/* Header */
-.header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 40px;
-  position: relative;
-  overflow: hidden;
-}
-
-.header::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -10%;
-  width: 500px;
-  height: 500px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 50%;
-}
-
-.header-content {
-  position: relative;
-  z-index: 1;
-}
-
-.header h1 {
-  font-size: 2.5em;
-  margin-bottom: 10px;
-  font-weight: 700;
+/* Dashboard Layout */
+.dashboard-layout {
   display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.header h1 i {
-  font-size: 0.9em;
-}
-
-.header p {
-  font-size: 1.2em;
-  opacity: 0.95;
-  font-weight: 300;
-}
-
-.header-stats {
-  display: flex;
-  gap: 30px;
-  margin-top: 30px;
-  flex-wrap: wrap;
-}
-
-.stat-item {
-  background: rgba(255,255,255,0.2);
-  padding: 15px 25px;
-  border-radius: 12px;
-  backdrop-filter: blur(10px);
-}
-
-.stat-item .stat-value {
-  font-size: 2em;
-  font-weight: 700;
-  display: block;
-}
-
-.stat-item .stat-label {
-  font-size: 0.9em;
-  opacity: 0.9;
+  min-height: 80vh;
 }
 
 /* Navigation */
 .nav-tabs {
   display: flex;
-  background: var(--light);
-  border-bottom: 2px solid var(--border);
-  overflow-x: auto;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-right: 2px solid var(--border);
+  min-width: 200px;
+  padding: 20px 0;
   position: sticky;
   top: 0;
-  z-index: 100;
+  height: fit-content;
+  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.05);
+}
+
+.dashboard-content {
+  flex: 1;
+  padding: 40px;
+  overflow-y: auto;
 }
 
 .nav-tab {
-  flex: 1;
-  min-width: 150px;
-  padding: 20px 25px;
-  text-align: center;
+  width: 100%;
+  padding: 18px 25px;
+  text-align: left;
   cursor: pointer;
   transition: all 0.3s;
   border: none;
@@ -133,9 +87,11 @@
   color: var(--text-light);
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
+  justify-content: flex-start;
+  gap: 12px;
   position: relative;
+  border-left: 4px solid transparent;
+  margin: 4px 0;
 }
 
 .nav-tab i {
@@ -143,28 +99,32 @@
 }
 
 .nav-tab:hover {
-  background: white;
+  background: linear-gradient(90deg, rgba(99, 102, 241, 0.1) 0%, transparent 100%);
   color: var(--primary);
+  border-left-color: var(--primary);
 }
 
 .nav-tab.active {
-  background: white;
+  background: linear-gradient(90deg, rgba(99, 102, 241, 0.15) 0%, transparent 100%);
   color: var(--primary);
+  border-left-color: var(--primary);
+  font-weight: 700;
 }
 
-.nav-tab.active::after {
+.nav-tab.active::before {
   content: '';
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
+  left: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 60%;
   background: var(--primary);
+  border-radius: 0 4px 4px 0;
 }
 
 /* Content */
 .tab-content {
-  padding: 40px;
   animation: fadeIn 0.5s;
 }
 
@@ -484,19 +444,40 @@ textarea {
 
 /* Responsive */
 @media (max-width: 768px) {
-  .header h1 {
-    font-size: 1.8em;
+  .dashboard-layout {
+    flex-direction: column;
   }
 
-  .header p {
-    font-size: 1em;
+  .nav-tabs {
+    flex-direction: row;
+    min-width: 100%;
+    width: 100%;
+    overflow-x: auto;
+    border-right: none;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .nav-tab {
+    min-width: 120px;
+    justify-content: center;
+    border-left: none;
+    border-bottom: 4px solid transparent;
+  }
+
+  .nav-tab.active {
+    border-left: none;
+    border-bottom-color: var(--primary);
+  }
+
+  .nav-tab.active::before {
+    display: none;
   }
 
   .nav-tab span {
     display: none;
   }
 
-  .tab-content {
+  .dashboard-content {
     padding: 20px;
   }
 
