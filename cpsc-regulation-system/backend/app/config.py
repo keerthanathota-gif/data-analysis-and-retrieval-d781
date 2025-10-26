@@ -29,7 +29,13 @@ def get_sqlite_url(db_name):
     db_path_str = str(db_path.absolute())
     # Convert backslashes to forward slashes for SQLite
     db_path_str = db_path_str.replace('\\', '/')
-    return f"sqlite:///{db_path_str}"
+    # Remove any drive letter colon issues on Windows (C: becomes C)
+    # SQLite expects forward slashes even on Windows
+    if len(db_path_str) > 1 and db_path_str[1] == ':':
+        # Windows absolute path - ensure proper format
+        return f"sqlite:///{db_path_str}"
+    else:
+        return f"sqlite:///{db_path_str}"
 
 # Database configuration - Dual databases for clean separation
 AUTH_DATABASE_URL = get_sqlite_url('auth.db')
