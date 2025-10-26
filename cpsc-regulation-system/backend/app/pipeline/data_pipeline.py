@@ -59,14 +59,14 @@ class DataPipeline:
     def update_status(self, state: str = None, current_step: str = None, 
                      progress: int = None, error_message: str = None):
         """Update pipeline status"""
-        import time
+        from datetime import datetime
         
         if state:
             self.status['state'] = state
             if state == 'running' and not self.status['start_time']:
-                self.status['start_time'] = time.time()
+                self.status['start_time'] = datetime.now()
             elif state in ['completed', 'error']:
-                self.status['end_time'] = time.time()
+                self.status['end_time'] = datetime.now()
         
         if current_step:
             self.status['current_step'] = current_step
@@ -131,16 +131,27 @@ class DataPipeline:
                 print(f"  {key}: {value}")
                 
         except Exception as e:
-            self.update_status(state='error', error_message=str(e))
-            print(f"\n[ERROR] Pipeline failed: {e}")
+            import traceback
+            error_details = f"{type(e).__name__}: {str(e)}"
+            self.update_status(state='error', error_message=error_details)
+            print(f"\n[ERROR] Pipeline failed: {error_details}")
+            print(f"[ERROR] Full traceback:")
+            traceback.print_exc()
             raise
     
     def crawl_data(self):
         """Crawl and download CFR data from configured URLs"""
+        print(f"  Processing {len(self.crawl_urls)} URL(s)...")
+        
         for target_url_base in self.crawl_urls:
             try:
                 # Parse URL to construct zip filename
                 url_parts = [part for part in target_url_base.split('/') if part]
+                
+                if len(url_parts) < 2:
+                    print(f"  [WARNING] Invalid URL format: {target_url_base}")
+                    continue
+                    
                 year = url_parts[-2]
                 title_part = url_parts[-1]
                 
@@ -149,15 +160,21 @@ class DataPipeline:
                 
                 print(f"  Downloading: {full_zip_url}")
                 download_and_extract_zip(full_zip_url, self.data_dir)
+                print(f"  [OK] Downloaded and extracted successfully")
             except Exception as e:
-                print(f"  Error downloading from {target_url_base}: {e}")
+                import traceback
+                print(f"  [ERROR] Error downloading from {target_url_base}: {e}")
+                print(f"  [ERROR] Traceback: {traceback.format_exc()}")
+                raise
     
     def parse_xml_files(self) -> List[Dict[str, Any]]:
         """Parse all XML files in the data directory"""
+        print(f"  Looking for XML files in: {self.data_dir}")
         xml_files = glob.glob(os.path.join(self.data_dir, "*.xml"))
         
         if not xml_files:
-            print("  No XML files found in data directory")
+            print(f"  [WARNING] No XML files found in data directory: {self.data_dir}")
+            print(f"  [WARNING] Directory contents: {os.listdir(self.data_dir) if os.path.exists(self.data_dir) else 'Directory does not exist'}")
             return []
         
         parsed_data_list = []
@@ -177,12 +194,21 @@ class DataPipeline:
                 parsed_data_list.append(parsed_data)
                 print(f"    [OK] Saved to {json_output} and {csv_output}")
             except Exception as e:
+                import traceback
                 print(f"    [ERROR] Error parsing {xml_file}: {e}")
+                print(f"    [ERROR] Traceback: {traceback.format_exc()}")
+                # Continue with next file instead of crashing
         
         return parsed_data_list
     
     def store_in_database(self, parsed_data_list: List[Dict[str, Any]]):
         """Store parsed data in SQLite database"""
+        print(f"  Processing {len(parsed_data_list)} parsed file(s)...")
+        
+        if not parsed_data_list:
+            print("  [WARNING] No parsed data to store!")
+            return
+            
         db = SessionLocal()
         
         try:
@@ -240,6 +266,12 @@ class DataPipeline:
             # Generate chapter embeddings
             print("  Generating chapter embeddings...")
             chapters = db.query(Chapter).all()
+            print(f"    Found {len(chapters)} chapters")
+            
+            if len(chapters) == 0:
+                print("    [WARNING] No chapters found in database!")
+                return
+            
             for chapter in tqdm(chapters, desc="    Chapters"):
                 # Create text representation
                 text = chapter.name
@@ -259,6 +291,8 @@ class DataPipeline:
             # Generate subchapter embeddings
             print("  Generating subchapter embeddings...")
             subchapters = db.query(Subchapter).all()
+            print(f"    Found {len(subchapters)} subchapters")
+            
             for subchapter in tqdm(subchapters, desc="    Subchapters"):
                 # Create text representation
                 text = f"{subchapter.chapter.name} - {subchapter.name}"
@@ -278,6 +312,7 @@ class DataPipeline:
             # Generate section embeddings
             print("  Generating section embeddings...")
             sections = db.query(Section).all()
+            print(f"    Found {len(sections)} sections")
             
             # Batch process sections for efficiency
             batch_size = 32
@@ -305,8 +340,10 @@ class DataPipeline:
 
             print("  [OK] Embeddings generated successfully")
         except Exception as e:
+            import traceback
             db.rollback()
             print(f"  [ERROR] Error generating embeddings: {e}")
+            print(f"  [ERROR] Traceback: {traceback.format_exc()}")
             raise
         finally:
             db.close()
