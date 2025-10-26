@@ -214,8 +214,15 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      await login(formData.username, formData.password);
-      navigate('/dashboard');
+      const loginResponse = await login(formData.username, formData.password);
+      
+      // Ensure the token and user are set before navigating
+      if (loginResponse && loginResponse.access_token) {
+        // Small delay to ensure state is fully updated
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 100);
+      }
     } catch (err) {
       console.error('Login error:', err);
       const errorMessage = err.response?.data?.detail || 

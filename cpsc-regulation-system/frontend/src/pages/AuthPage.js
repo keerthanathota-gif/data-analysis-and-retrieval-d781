@@ -279,17 +279,18 @@ const AuthPage = () => {
           setLoading(false);
           return;
         }
-        await signup({
+        const signupResponse = await signup({
           username: formData.username,
           email: formData.email,
           password: formData.password,
           role: formData.role
         });
         
-        // Show success message
-        setSuccess(`Account created successfully! You can now login with username: ${formData.username}`);
+        // Show success message with username from response
+        const signupUsername = signupResponse.username || formData.username;
+        setSuccess(`Account created successfully! You can now login with username: ${signupUsername}`);
         
-        // Switch to login mode after 2 seconds
+        // Switch to login mode after 3 seconds
         setTimeout(() => {
           setIsSignup(false);
           setSuccess('');
@@ -297,7 +298,7 @@ const AuthPage = () => {
         
         // Clear form but keep username for easy login
         setFormData({
-          username: formData.username,
+          username: signupUsername,
           email: '',
           password: '',
           confirmPassword: '',
@@ -305,8 +306,16 @@ const AuthPage = () => {
           role: 'user'
         });
       } else {
-        await login(formData.username, formData.password);
-        navigate('/dashboard');
+        // Login and wait for state to update
+        const loginResponse = await login(formData.username, formData.password);
+        
+        // Ensure the token and user are set before navigating
+        if (loginResponse && loginResponse.access_token) {
+          // Small delay to ensure state is fully updated
+          setTimeout(() => {
+            navigate('/dashboard');
+          }, 100);
+        }
       }
     } catch (err) {
       console.error('Auth error:', err);
