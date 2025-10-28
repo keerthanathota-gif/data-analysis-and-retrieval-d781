@@ -14,6 +14,7 @@ from app.models.cfr_database import init_cfr_db
 from app.auth.routes import router as auth_router
 from app.admin.routes import router as admin_router
 from app.search.routes import router as search_router
+from app.network.routes import router as network_router
 from app.config import API_HOST, API_PORT, ALLOWED_ORIGINS, VISUALIZATIONS_DIR, DATA_DIR, OUTPUT_DIR
 
 # Initialize FastAPI app
@@ -46,6 +47,7 @@ app.mount("/visualizations", StaticFiles(directory=VISUALIZATIONS_DIR), name="vi
 app.include_router(auth_router)
 app.include_router(admin_router)
 app.include_router(search_router)
+app.include_router(network_router)
 
 # Initialize databases on startup
 @app.on_event("startup")
